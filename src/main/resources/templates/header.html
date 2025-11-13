@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<body>
+
+<!--
+  Дефинираме този HTML блок като фрагмент с име "header".
+  Използваме Tailwind CSS класове за бърз и responsive дизайн.
+-->
+<header class="bg-dark-bg text-text-light shadow-lg sticky top-0 z-50" th:fragment="header">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+
+      <!-- Лого -->
+      <div class="flex-shrink-0">
+        <a href="/admin/products" class="text-3xl font-serif font-bold text-text-light hover:text-primary-color transition-colors">
+          Борово Око<span class="text-primary-color">.</span>
+        </a>
+      </div>
+
+      <!-- Навигация (Десктоп) -->
+      <div class="hidden md:flex md:items-center md:space-x-8">
+        <a href="/admin/products" class="nav-link">
+          <i class="fas fa-utensils mr-2"></i>Продукти
+        </a>
+        <a href="/admin/orders" class="nav-link">
+          <i class="fas fa-clipboard-list mr-2"></i>Поръчки
+        </a>
+        <a href="/admin/users" class="nav-link">
+          <i class="fas fa-users mr-2"></i>Потребители
+        </a>
+        <a href="/logout" class="nav-link-logout">
+          <i class="fas fa-sign-out-alt mr-2"></i>Изход
+        </a>
+      </div>
+
+      <!-- Хамбургер бутон (Мобилен) -->
+      <div class="md:hidden flex items-center">
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-controls="mobile-menu" aria-expanded="false">
+          <span class="sr-only">Отвори менюто</span>
+          <div class="icon-bar1"></div>
+          <div class="icon-bar2"></div>
+          <div class="icon-bar3"></div>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Мобилно меню (скрито по подразбиране) -->
+  <div class="md:hidden hidden" id="mobile-menu">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      <a href="/admin/products" class="mobile-nav-link">
+        <i class="fas fa-utensils mr-2"></i>Продукти
+      </a>
+      <a href="/admin/orders" class="mobile-nav-link">
+        <i class="fas fa-clipboard-list mr-2"></i>Поръчки
+      </a>
+      <a href="/admin/users" class="mobile-nav-link">
+        <i class="fas fa-users mr-2"></i>Потребители
+      </a>
+      <a href="/logout" class="mobile-nav-link-logout">
+        <i class="fas fa-sign-out-alt mr-2"></i>Изход
+      </a>
+    </div>
+  </div>
+
+  <!-- CSS Специфичен за Хедъра -->
+  <style>
+    .nav-link {
+        @apply text-text-light font-medium tracking-wide uppercase text-sm;
+        padding: 0.5rem 0;
+        border-bottom: 2px solid transparent;
+        transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .nav-link:hover {
+        @apply text-primary-color border-primary-color;
+    }
+
+    .nav-link-logout {
+        @apply text-text-light bg-primary-color bg-opacity-20 font-medium px-4 py-2 rounded-lg text-sm;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .nav-link-logout:hover {
+         @apply bg-primary-color text-dark-bg;
+    }
+
+    /* Мобилни линкове */
+    .mobile-nav-link {
+        @apply text-text-light block px-3 py-3 rounded-md text-base font-medium;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .mobile-nav-link:hover {
+        @apply bg-primary-color text-dark-bg;
+    }
+    .mobile-nav-link-logout {
+         @apply text-text-light bg-primary-color bg-opacity-20 block px-3 py-3 rounded-md text-base font-medium;
+         transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .mobile-nav-link-logout:hover {
+        @apply bg-primary-color text-dark-bg;
+    }
+
+
+    /* Хамбургер Анимация */
+    .hamburger-btn {
+        padding: 10px;
+        display: inline-block;
+        cursor: pointer;
+        background-color: transparent;
+        border: 0;
+    }
+    .hamburger-btn .icon-bar1,
+    .hamburger-btn .icon-bar2,
+    .hamburger-btn .icon-bar3 {
+        width: 25px;
+        height: 3px;
+        background-color: var(--text-light);
+        margin: 5px 0;
+        transition: 0.4s;
+        border-radius: 2px;
+    }
+    .hamburger-btn.is-active .icon-bar1 {
+        transform: rotate(-45deg) translate(-6px, 6px);
+    }
+    .hamburger-btn.is-active .icon-bar2 {
+        opacity: 0;
+    }
+    .hamburger-btn.is-active .icon-bar3 {
+        transform: rotate(45deg) translate(-5px, -5px);
+    }
+  </style>
+</header>
+
+</body>
+</html>

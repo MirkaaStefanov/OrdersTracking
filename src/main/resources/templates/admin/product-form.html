@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+<head>
+  <title th:text="${formTitle}"></title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h1 th:text="${formTitle}">Форма за продукт</h1>
+
+  <form th:action="${productDTO.id == null} ? @{/admin/products/save} : @{/admin/products/update/{id}(id=${productDTO.id})}"
+        th:object="${productDTO}" method="post" class="product-form" style="max-width: 48rem; margin: 0 auto;">
+
+    <input type="hidden" th:field="*{id}" />
+
+    <div class="form-group">
+      <label for="name">Име:</label>
+      <input type="text" id="name" th:field="*{name}" required />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Описание:</label>
+      <textarea id="description" th:field="*{description}" rows="4"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="category">Категория:</label>
+      <select id="category" th:field="*{category}" required>
+        <option value="">Избери категория</option>
+        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}"></option>
+      </select>
+    </div>
+
+    <div class="grid-cols-2">
+      <div class="form-group">
+        <label for="price">Цена (ЛВ):</label>
+        <input type="number" id="price" th:field="*{price}" step="0.01" min="0" required />
+      </div>
+
+      <div class="form-group">
+        <label for="gr">Грамаж (гр):</label>
+        <input type="number" id="gr" th:field="*{gr}" min="0" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="available" style="display: flex; align-items: center; cursor: pointer;">
+        <input type="checkbox" id="available" th:field="*{available}" style="width: 1.25rem; height: 1.25rem;" />
+        <span style="margin-left: 0.75rem; font-size: 1rem; font-weight: normal;">Наличен</span>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-2"></i> Запази</button>
+      <a th:href="@{/admin/products}" class="btn btn-secondary"><i class="fas fa-times-circle mr-2"></i> Отмени</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>

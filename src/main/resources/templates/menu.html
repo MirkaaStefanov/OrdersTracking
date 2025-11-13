@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/public-layout}">
+<head>
+    <title>Меню</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <section class="hero-section" th:style="'background-image: url(' + @{/images/Görüntü.jpg} + ');'">
+        <div class="hero-logo">
+            <img th:src="@{/images/Görüntü 1.jpeg}" alt="Лого Борово Око">
+        </div>
+    </section>
+
+    <div class="menu-wrapper container">
+        <h1>Нашето Меню</h1>
+
+        <div th:if="${menu == null or menu.isEmpty()}" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <h2><i class="fas fa-inbox"></i> В момента няма налични продукти.</h2>
+            <p>Моля, проверете отново по-късно.</p>
+        </div>
+
+        <div class="menu-container" th:unless="${menu == null or menu.isEmpty()}">
+
+            <div class="menu-card" th:each="product : ${menu}">
+
+                <h3 th:text="${product.name}">Име на продукт</h3>
+
+                <p class="menu-card-desc" th:text="${product.description}">
+                    Кратко описание на продукта, което обяснява съставките.
+                </p>
+
+                <div class="menu-card-footer">
+                    <div class="menu-card-prices">
+                        <span class="price-bgn" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' лв.'">9.90 лв.</span>
+                        <span class="price-eur" th:text="${#numbers.formatDecimal(product.euroPrice, 1, 2)} + ' €'">5.01 €</span>
+                    </div>
+
+                    <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                        <input type="hidden" name="quantity" value="1" />
+                        <button type="submit" class="btn-add-cart" title="Добави">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

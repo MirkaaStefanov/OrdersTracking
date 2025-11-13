@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+
+        .profile-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-image {
+            max-width: 100%;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #555;
+        }
+
+        .user-details {
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .user-details h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .user-details p {
+            color: #555;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+
+    <header th:insert="header.html"></header>
+</header>
+
+<h1>User Profile</h1>
+<div class="profile-container">
+    <img class="profile-image" src="profile-picture.jpg" alt="Profile Picture">
+    <div class="user-info">
+        <h1 sec:authentication="principal.username"></h1>
+        <p sec:authentication="principal.role"></p>
+    </div>
+
+    <div class="user-details">
+        <h2>Contact Information</h2>
+
+    </div>
+
+    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+        <input class=" text-bg-primary" type="submit" value="Sign Out"/>
+    </form>
+</div>
+</body>
+</html>

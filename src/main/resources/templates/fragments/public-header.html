@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<body>
+
+<header class="public-nav" th:fragment="header" id="publicNav"> <div class="nav-content">
+    <a th:href="@{/}" class="logo">Борово Око<span>.</span></a>
+    <div class="nav-links">
+
+        <a th:href="@{/menu}"
+           th:classappend="${activePage == 'menu' ? 'active' : ''}">Меню</a>
+
+        <div class="cart-icon-wrapper">
+            <a th:href="@{/cart}" class="cart-icon" title="Количка"
+               th:classappend="${activePage == 'cart' ? 'active' : ''}">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+
+            <span class="cart-quantity-badge"
+                  th:if="${cartItemCount != null and cartItemCount > 0}"
+                  th:text="${cartItemCount}">
+                    0
+                </span>
+        </div>
+
+    </div>
+</div>
+</header>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${pageTitle ?: 'Административен Панел'}">Администрация</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo">
+      Борово Око<span>.</span>
+    </div>
+
+    <button class="hamburger" id="hamburger-btn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <ul class="nav-links" id="nav-menu">
+      <li><a href="/admin/products"><i class="fas fa-utensils"></i> Продукти</a></li>
+      <li><a href="/admin/orders"><i class="fas fa-clipboard-list"></i> Поръчки</a></li>
+      <li><a href="/admin/users"><i class="fas fa-users"></i> Потребители</a></li>
+      <li><a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Изход</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="main-container">
+
+  <div th:if="${success != null}" class="alert alert-success" role="alert">
+    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+  </div>
+  <div th:if="${error != null}" class="alert alert-error" role="alert">
+    <i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+  </div>
+
+  <div class="content-card">
+    <th:block layout:fragment="content"></th:block>
+  </div>
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (hamburgerBtn && navMenu) {
+      hamburgerBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        hamburgerBtn.classList.toggle('active');
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

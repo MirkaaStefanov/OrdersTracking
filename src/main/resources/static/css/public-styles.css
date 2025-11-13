@@ -1,0 +1,379 @@
+/* ========================================
+   PUBLIC STYLES (public-styles.css)
+   ======================================== */
+
+/* --- Основни променливи --- */
+:root {
+  --primary-green: #4a634e;  /* Зелено от менюто във Facebook */
+  --primary-green-hover: #3b513f;
+  --accent-teal: #61C0BF;    /* Светло синьо от логото */
+  --footer-bg: #1a2e2e;      /* Тъмно от админ хедъра */
+  --body-bg: #fdfdfd;       /* Много светло сиво/бяло за фон */
+  --card-bg: #ffffff;
+  --text-dark: #212529;
+  --text-light: #ffffff;
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Lato', sans-serif;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Глобални стилове --- */
+body {
+  font-family: var(--font-sans);
+  color: var(--text-dark);
+  line-height: 1.6;
+  background-color: var(--body-bg);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+h1 { font-size: 2.5rem; margin-bottom: 1rem; text-align: center; }
+h2 { font-size: 2rem; margin-bottom: 0.75rem; }
+h3 { font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--primary-green); }
+
+a {
+  color: var(--primary-green);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover { color: var(--primary-green-hover); }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* --- Бутони --- */
+.btn {
+  display: inline-block;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  font-size: 0.9rem;
+}
+.btn-primary {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+}
+.btn-primary:hover {
+  background-color: var(--primary-green-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   НОВ ХЕДЪР (Прозрачен при скрол)
+   ======================================== */
+.public-nav {
+  background: transparent; /* Прозрачен по подразбиране */
+  position: fixed; /* Фиксиран в горната част */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-bottom 0.3s ease;
+}
+.public-nav .nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.public-nav .logo {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-light); /* Светло лого по подразбиране (за Hero) */
+  transition: color 0.3s ease;
+}
+.public-nav .logo span {
+  color: var(--accent-teal); /* Светло лого по подразбиране */
+  transition: color 0.3s ease;
+}
+.public-nav .nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+.public-nav .nav-links a {
+  font-weight: 600;
+  color: var(--text-light); /* Светли линкове по подразбиране */
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.public-nav .nav-links a:hover {
+  color: var(--accent-teal);
+  border-bottom-color: var(--accent-teal);
+}
+.public-nav .nav-links a.active {
+  color: var(--accent-teal);
+  border-bottom-color: var(--accent-teal);
+}
+
+/* Стил за "скролнат" хедър */
+.public-nav.nav-scrolled {
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+.public-nav.nav-scrolled .logo {
+  color: var(--text-dark); /* Тъмно лого при скрол */
+}
+.public-nav.nav-scrolled .logo span {
+  color: var(--primary-green); /* Тъмно лого при скрол */
+}
+.public-nav.nav-scrolled .nav-links a {
+  color: var(--text-dark); /* Тъмни линкове при скрол */
+}
+.public-nav.nav-scrolled .nav-links a:hover {
+  color: var(--primary-green);
+  border-bottom-color: var(--primary-green);
+}
+.public-nav.nav-scrolled .nav-links a.active {
+  color: var(--primary-green);
+  border-bottom-color: var(--primary-green);
+}
+
+/* НОВ Брояч на количката */
+.cart-icon-wrapper {
+  position: relative;
+}
+.cart-quantity-badge {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--card-bg); /* За да се вижда върху тъмния хедър */
+}
+.public-nav.nav-scrolled .cart-quantity-badge {
+  border-color: var(--card-bg);
+}
+
+
+/* ========================================
+   ПРОМЕНЕНА Hero Секция
+   ======================================== */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 350px; /* По-ниска по подразбиране */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 100px; /* Място за логото */
+}
+.hero-logo {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: var(--body-bg);
+  padding: 10px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+.hero-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Меню Секция --- */
+.menu-wrapper {
+  padding: 2rem 0;
+}
+.menu-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* ========================================
+   НОВА Карта на менюто
+   ======================================== */
+.menu-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.menu-card h3 {
+  margin-top: 0; /* Име на продукт */
+}
+.menu-card-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  flex-grow: 1;
+  margin: 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--border-color); /* Разделител */
+  padding-bottom: 1rem;
+}
+
+/* Нова секция за цени и бутон */
+.menu-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.menu-card-prices {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+.price-bgn {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-green);
+}
+.price-eur {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Нов бутон за добавяне */
+.btn-add-cart {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-add-cart:hover {
+  background-color: var(--primary-green-hover);
+  transform: scale(1.1);
+}
+
+/* --- Футър (без промяна) --- */
+.site-footer {
+  background-color: var(--footer-bg);
+  color: var(--text-light);
+  padding: 3rem 1.5rem;
+  margin-top: 4rem;
+  font-size: 0.9rem;
+}
+.site-footer .container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+.site-footer h4 {
+  font-family: var(--font-serif);
+  color: var(--accent-teal);
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+.site-footer ul { list-style: none; padding: 0; margin: 0; }
+.site-footer li { margin-bottom: 0.75rem; }
+.site-footer a {
+  color: #f1f5f9;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.site-footer a:hover { color: var(--accent-teal); }
+.site-footer .footer-logo { font-size: 1.5rem; font-family: var(--font-serif); font-weight: 700; }
+.site-footer .footer-logo span { color: var(--accent-teal); }
+.site-footer .social-icons { display: flex; gap: 1.5rem; font-size: 1.5rem; }
+
+/* ========================================
+   СТИЛОВЕ ЗА КОЛИЧКА (без промяна)
+   ======================================== */
+.cart-empty-message { text-align: center; padding: 4rem 2rem; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-sm); color: var(--text-muted); }
+.cart-empty-message h2 { color: var(--text-dark); }
+.cart-wrapper { display: flex; flex-direction: row; gap: 2rem; align-items: flex-start; }
+.cart-items-table { flex: 3; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.cart-items-table table { width: 100%; border-collapse: collapse; text-align: left; }
+.cart-items-table thead th { padding: 1rem 1.25rem; border-bottom: 2px solid var(--border-color); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; background-color: #f8f9fa; }
+.cart-items-table tbody td { padding: 1.25rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+.cart-items-table tbody tr:last-child td { border-bottom: none; }
+.cart-item-quantity span { display: inline-block; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-weight: 600; min-width: 40px; text-align: center; }
+.btn-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0.5rem; border-radius: 8px; transition: all 0.2s ease; }
+.btn-remove:hover { color: var(--error-color); background-color: #fbe9e7; }
+.cart-summary { flex: 1; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-sm); padding: 1.5rem; position: sticky; top: 100px; }
+.cart-summary h3 { font-family: var(--font-serif); font-size: 1.5rem; margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1rem; }
+.summary-row span:last-child { font-weight: 600; }
+.summary-row.total { font-size: 1.25rem; font-weight: 700; color: var(--primary-green); border-top: 2px solid var(--border-color); padding-top: 1rem; }
+
+/* ========================================
+   НОВИ Responsive стилове (за Hero и Лого)
+   ======================================== */
+@media (max-width: 992px) {
+  .cart-wrapper { flex-direction: column; }
+  .cart-summary { width: 100%; position: static; }
+}
+
+@media (max-width: 600px) {
+  /* По-малка Hero секция за мобилни */
+  .hero-section {
+    height: 250px;
+    margin-bottom: 70px; /* По-малко място за по-малкото лого */
+  }
+  /* По-малко лого за мобилни */
+  .hero-logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  /* Мобилна таблица за количка (без промяна) */
+  .cart-items-table { border: none; box-shadow: none; }
+  .cart-items-table thead { display: none; }
+  .cart-items-table tbody tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-sm); background: var(--card-bg); }
+  .cart-items-table tbody td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); text-align: right; padding: 0.75rem 1rem; }
+  .cart-items-table tbody td:last-child { border-bottom: none; }
+  .cart-items-table tbody td::before { content: attr(data-label); font-weight: 600; color: var(--text-muted); text-align: left; margin-right: 1rem; }
+  .cart-items-table tbody td:nth-of-type(1)::before { content: 'Продукт'; }
+  .cart-items-table tbody td:nth-of-type(2)::before { content: 'Ед. Цена'; }
+  .cart-items-table tbody td:nth-of-type(3)::before { content: 'Количество'; }
+  .cart-items-table tbody td:nth-of-type(4)::before { content: 'Общо'; }
+  .cart-items-table tbody td:nth-of-type(5)::before { content: ''; }
+}
