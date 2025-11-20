@@ -1,6 +1,7 @@
 package com.example.OrdersTracking.models;
 
 import com.example.OrdersTracking.enums.MenuCategory;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

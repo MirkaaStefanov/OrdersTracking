@@ -13,5 +13,6 @@ public class GuestDetailsDTO {
     private String email;
     private String phone;
     private String location;
+    private boolean cash;
 
 }

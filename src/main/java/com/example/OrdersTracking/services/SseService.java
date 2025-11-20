@@ -1,5 +1,6 @@
 package com.example.OrdersTracking.services;
 
+import com.example.OrdersTracking.models.Order;
 import com.example.OrdersTracking.models.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -33,12 +34,22 @@ public class SseService {
     public void sendNewUserEvent(User user) {
         // Send the new user event to all connected clients
         for (SseEmitter emitter : emitters) {
+            broadcast("new-user", user);
+        }
+    }
+
+    public void sendNewOrderEvent(Order order) {
+        broadcast("new-order", order);
+    }
+
+    // Helper method to avoid code duplication
+    private void broadcast(String eventName, Object data) {
+        for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("new-user") // Event name
-                        .data(user));     // Event data (Spring will serialize User to JSON)
+                        .name(eventName)
+                        .data(data));
             } catch (IOException e) {
-                // If this client is disconnected, remove them
                 emitters.remove(emitter);
             }
         }

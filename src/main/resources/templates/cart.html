@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -69,7 +70,10 @@
                                             <span class="text-stone-300 mx-1">|</span>
                                             <span th:text="${#numbers.formatDecimal(item.product.euroPrice, 1, 2)} + ' €'">2.50 €</span>
                                         </div>
-                                        <div class="mt-2 text-brand-teal font-bold text-sm" th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)} + ' лв.'">9.80 лв.</div>
+                                        <div class="mt-2 flex flex-col">
+                                            <span class="text-brand-teal font-bold text-sm" th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)} + ' лв.'">9.80 лв.</span>
+                                            <span class="text-stone-400 text-xs" th:text="${#numbers.formatDecimal(item.product.euroPrice * item.quantity, 1, 2)} + ' €'">5.00 €</span>
+                                        </div>
                                     </div>
 
                                     <!-- Right: Controls -->
@@ -175,12 +179,10 @@
                         <div class="space-y-4 mb-8">
                             <div class="flex justify-between text-stone-600">
                                 <span>Междинна сума</span>
-                                <span class="font-medium" th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
-                            </div>
-                            <!-- Approximate Total in Euro for display -->
-                            <div class="flex justify-between text-stone-400 text-sm">
-                                <span>(в евро)</span>
-                                <span class="font-medium" th:text="'~' + ${#numbers.formatDecimal(totalPrice / 1.95583, 1, 2)} + ' €'">0.00 €</span>
+                                <div class="text-right">
+                                    <span class="font-medium block" th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
+                                    <span class="text-xs text-stone-400 block" th:text="${#numbers.formatDecimal(totalPrice / 1.95583, 1, 2)} + ' €'">0.00 €</span>
+                                </div>
                             </div>
                             <div class="flex justify-between text-stone-600 pt-2">
                                 <span>Доставка</span>
@@ -192,7 +194,8 @@
                             <span class="text-lg font-serif font-bold text-brand-dark">Общо</span>
                             <div class="text-right">
                                 <span class="block text-3xl font-bold text-brand-teal" th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
-                                <span class="text-xs text-stone-400">с включено ДДС</span>
+                                <span class="block text-lg font-medium text-stone-500 mt-1" th:text="${#numbers.formatDecimal(totalPrice / 1.95583, 1, 2)} + ' €'">0.00 €</span>
+                                <span class="text-xs text-stone-400 block mt-1">с включено ДДС</span>
                             </div>
                         </div>
 

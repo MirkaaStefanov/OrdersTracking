@@ -1,5 +1,6 @@
 package com.example.OrdersTracking.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,6 +30,7 @@ public class OrderItem {
     // --- ВРЪЗКА КЪМ ГЛАВНАТА ПОРЪЧКА ---
     // Много OrderItems принадлежат на един Order
     // nullable = false: Артикулът НЕ МОЖЕ да съществува без поръчка
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     @ToString.Exclude // Изключваме от ToString
@@ -36,7 +38,7 @@ public class OrderItem {
 
     // --- ВРЪЗКА КЪМ ПРОДУКТА ---
     // Много OrderItems могат да сочат към един Product
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     @ToString.Exclude
     private Product product; // Връзка към вашия Product @Entity

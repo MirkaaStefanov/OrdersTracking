@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,4 +103,19 @@ public class CartService {
     public void clearCart(HttpSession session) {
         session.removeAttribute(CART_SESSION_KEY);
     }
+
+    public BigDecimal calculateTotalPrice(HttpSession session) {
+        Cart cart = getCart(session);
+
+        // Use Java Streams to sum up (Price * Quantity) for every item
+        return cart.getCartItems().stream()
+                .map(item -> {
+                    BigDecimal price = item.getProduct().getPrice();
+                    BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+
+                    return price.multiply(quantity);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
 }

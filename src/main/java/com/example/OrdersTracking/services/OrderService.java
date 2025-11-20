@@ -9,14 +9,17 @@ import com.example.OrdersTracking.models.OrderItem;
 import com.example.OrdersTracking.repositories.OrderItemRepository;
 import com.example.OrdersTracking.repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 // Трябва да създадете @Entity "Order" и "OrderItem"
 // Този код е само ПРИМЕРЕН и зависи от вашите Entity-та
@@ -30,6 +33,9 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private SseService sseService;
 
     // @Autowired private EmailService emailService; // За изпращане на имейли
 
@@ -49,7 +55,12 @@ public class OrderService {
         order.setCustomerEmail(guestDetails.getEmail());
         order.setCustomerPhone(guestDetails.getPhone());
         order.setLocation(guestDetails.getLocation());
-        order.setStatus(OrderStatus.PROCESSING); // Задаваме начален статус
+
+        if (guestDetails.isCash()) {
+            order.setStatus(OrderStatus.PROCESSING); // Cash payment -> start processing immediately
+        } else {
+            order.setStatus(OrderStatus.PAYMENT);    // Card payment -> wait for Stripe confirmation
+        }
 
         // Генерираме "вълшебния линк" токен (от първия ни разговор)
         order.setAccessToken(UUID.randomUUID().toString());
@@ -77,10 +88,13 @@ public class OrderService {
         }
 
         // 4. Запазваме всички артикули от поръчката
-        orderItemRepository.saveAll(orderItems);
+        List<OrderItem> savedItems = orderItemRepository.saveAll(orderItems);
+        savedOrder.setItems(savedItems);
+        Order sendOrder = orderRepository.save(savedOrder);
 
-        // 5. Изпращаме имейла за потвърждение
-        // sendConfirmationEmail(savedOrder);
+        if(guestDetails.isCash()){
+            sseService.sendNewOrderEvent(sendOrder);
+        }
 
         return savedOrder;
     }
@@ -91,5 +105,29 @@ public class OrderService {
         return Optional.empty(); // Засега
     }
 
-    // private void sendConfirmationEmail(Order order) { ... }
+    @Transactional
+    public void successPayment(Long orderId) throws ChangeSetPersister.NotFoundException {
+        Order order = orderRepository.findById(orderId).orElseThrow(ChangeSetPersister.NotFoundException::new);
+        order.setStatus(OrderStatus.PROCESSING);
+        Order savedOrder = orderRepository.save(order);
+        sseService.sendNewOrderEvent(savedOrder);
+    }
+    //TODO send email to track order
+
+    public List<Order> ordersForKitchen(){
+        List<Order> allOrders = orderRepository.findAll();
+
+        // 2. Filter by Status and Map to DTO
+        return allOrders.stream()
+                // 1. Filter: Keep only orders with status PROCESSING
+                .filter(order -> order.getStatus() == OrderStatus.PROCESSING)
+
+                // 2. Sort: Use Comparator to sort by orderDate (oldest first)
+                .sorted(Comparator.comparing(Order::getOrderDate))
+
+                // 3. Collect: Gather the sorted list
+                .collect(Collectors.toList());
+
+    }
+
 }

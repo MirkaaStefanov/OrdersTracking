@@ -1,6 +1,9 @@
 package com.example.OrdersTracking.models;
 
 import com.example.OrdersTracking.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +37,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     @ToString.Exclude // Изключваме от ToString, за да избегнем рекурсия
@@ -51,6 +54,7 @@ public class Order {
 
     // --- ДАННИ ЗА ПОРЪЧКАТА ---
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
@@ -70,6 +74,7 @@ public class Order {
     // Една поръчка има много OrderItems
     // cascade = CascadeType.ALL: Ако изтрием Order, изтрий и OrderItems
     // orphanRemoval = true: Ако премахнем OrderItem от този списък, изтрий го от DB
+    @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderItem> items;
 

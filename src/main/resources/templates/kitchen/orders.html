@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кухня - Поръчки</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#67b0b6',
+              gold: '#eab308',
+              dark: '#1c2e30',
+              light: '#fcfcfc',
+              muted: '#94a3b8'
+            }
+          },
+          animation: {
+             'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+             'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+             'flash-green': 'flashGreen 2s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            flashGreen: {
+              '0%': { borderColor: '#67b0b6', boxShadow: '0 0 20px rgba(103, 176, 182, 0.5)' },
+              '50%': { borderColor: '#67b0b6', boxShadow: '0 0 30px rgba(103, 176, 182, 0.8)' },
+              '100%': { borderColor: '#292524', boxShadow: 'none' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar for dark theme */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1c1917; }
+    ::-webkit-scrollbar-thumb { background: #44403c; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #57534e; }
+
+    body { font-family: 'Montserrat', sans-serif; }
+    h1, h2, h3, .font-serif { font-family: 'Cormorant Garamond', serif; }
+  </style>
+</head>
+<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col">
+
+<!-- Toast Container -->
+<div id="toast-container" class="fixed top-24 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+<!-- Header -->
+<header class="bg-brand-dark border-b border-white/10 px-6 py-4 shadow-lg sticky top-0 z-50">
+  <div class="flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <div class="h-12 w-12 rounded-full border-2 border-brand-teal flex items-center justify-center bg-white overflow-hidden">
+        <span class="text-brand-dark font-serif font-bold text-xl">B</span>
+      </div>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-white leading-none tracking-wide">КУХНЯ</h1>
+        <span class="text-[10px] uppercase tracking-[0.3em] text-brand-teal">Orders Dashboard</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4 md:gap-6">
+      <!-- Connection Status: Defaults to LIVE (Optimistic UI) -->
+      <div id="connection-status" class="flex items-center gap-2 text-xs uppercase font-bold text-green-500 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/30 transition-all duration-300">
+        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live
+      </div>
+
+      <form th:action="@{/logout}" method="post" class="hidden md:block">
+        <button type="submit" class="flex items-center gap-2 text-stone-400 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider">
+          <i class="fas fa-sign-out-alt"></i> Изход
+        </button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-grow p-6 overflow-y-auto">
+
+  <!-- Orders Grid -->
+  <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+
+    <!-- Existing Orders Loop -->
+    <div th:each="order : ${orders}" th:id="'order-' + ${order.id}"
+         class="group relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col hover:border-brand-teal/50 transition-all duration-300 animate-fade-in-up">
+
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-teal to-brand-dark"></div>
+
+      <div class="p-5 border-b border-stone-800 flex justify-between items-start bg-stone-900/50">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-2xl font-serif font-bold text-white">#<span th:text="${order.id}">123</span></span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-stone-400 font-medium uppercase tracking-wider">
+            <i class="far fa-clock"></i>
+            <span th:text="${#temporals.format(order.orderDate, 'HH:mm')}">14:30</span>
+          </div>
+        </div>
+        <div class="flex flex-col items-end">
+                         <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal/10 text-brand-teal border border-brand-teal/20 animate-pulse-slow">
+                            <span th:text="${order.status}">PROCESSING</span>
+                         </span>
+        </div>
+      </div>
+
+      <div class="p-5 flex-grow space-y-4">
+        <div class="flex items-start gap-3 text-sm text-stone-300 bg-stone-800/50 p-3 rounded-lg">
+          <i class="fas fa-map-marker-alt mt-1 text-brand-gold shrink-0"></i>
+          <span class="leading-snug font-medium" th:text="${order.location}">Location</span>
+        </div>
+
+        <div class="w-full h-px bg-stone-800"></div>
+
+        <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+          <li th:each="item : ${order.items}" class="flex justify-between items-start group/item">
+            <div class="flex items-start gap-3">
+                                <span class="flex items-center justify-center w-6 h-6 rounded-md bg-brand-teal/20 text-brand-teal font-bold text-sm shrink-0 border border-brand-teal/30"
+                                      th:text="${item.quantity}">1</span>
+              <span class="text-stone-200 font-medium leading-snug group-hover/item:text-white transition-colors" th:text="${item.product.name}">Product</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="p-4 bg-stone-950/30 border-t border-stone-800 flex justify-between items-center">
+        <span class="text-xs text-stone-500 font-mono" th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy')}">Date</span>
+        <span class="text-sm font-serif font-bold text-stone-300" th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div th:if="${orders.isEmpty()}" id="empty-state" class="h-full flex flex-col items-center justify-center text-stone-600 min-h-[60vh]">
+    <div class="w-32 h-32 rounded-full bg-stone-900 flex items-center justify-center mb-6 shadow-inner border border-stone-800">
+      <i class="fas fa-check text-5xl text-stone-700"></i>
+    </div>
+    <h2 class="text-3xl font-serif font-bold text-stone-500 mb-2">Всичко е готово!</h2>
+    <p class="text-stone-600">Няма чакащи поръчки в момента.</p>
+  </div>
+
+</main>
+
+<script th:inline="javascript">
+  // 1. Sound Configuration (Base64 provided by user)
+  // WARNING: The string provided is a valid header with 0 data bytes. It will play "silence".
+  const notificationSound = new Audio("data:audio/wav;base64,UklGRl9vT1BXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
+
+  // 2. Audio Unlock Logic
+  // Browsers require user interaction before playing audio. We listen to ANY interaction.
+  const interactionEvents = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll'];
+
+  function unlockAudio() {
+      notificationSound.play().then(() => {
+          notificationSound.pause();
+          notificationSound.currentTime = 0;
+          console.log("Audio unlocked successfully");
+      }).catch(error => {
+          // Expected if no interaction yet, or if string is invalid
+      });
+      // Once triggered, remove listeners to save performance
+      interactionEvents.forEach(e => document.removeEventListener(e, unlockAudio));
+  }
+
+  interactionEvents.forEach(e => document.addEventListener(e, unlockAudio, { passive: true, once: true }));
+
+  // 3. SSE Connection
+  const eventSource = new EventSource('/kitchen/stream');
+  const ordersContainer = document.getElementById('orders-container');
+  const emptyState = document.getElementById('empty-state');
+  const statusIndicator = document.getElementById('connection-status');
+
+  eventSource.onopen = function() {
+      console.log("SSE Connection Established");
+      // Ensure UI shows Green
+      updateStatus(true);
+  };
+
+  eventSource.onerror = function(event) {
+      console.error("SSE Error:", event);
+      // Change UI to Red
+      updateStatus(false);
+  };
+
+  function updateStatus(isLive) {
+      if (isLive) {
+          statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-green-500 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/30 transition-all duration-300";
+          statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live';
+      } else {
+          statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-red-500 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/30 transition-all duration-300";
+          statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> Reconnecting...';
+      }
+  }
+
+  // Helper: Parse date safely (handles Spring Boot array [2024, 10, 12, ...] or ISO string)
+  function parseDate(dateInput) {
+      if (!dateInput) return new Date();
+      if (Array.isArray(dateInput)) {
+          // Java array: [Year, Month(1-12), Day, Hour, Min, Sec]
+          // JS Date: Month is 0-11
+          const [y, m, d, h, min, s] = dateInput;
+          return new Date(y, (m || 1) - 1, d || 1, h || 0, min || 0, s || 0);
+      }
+      return new Date(dateInput);
+  }
+
+  // 4. Handle Incoming Orders
+  function handleIncomingOrder(event) {
+      console.log("Received Data:", event.data);
+
+      try {
+          const order = JSON.parse(event.data);
+
+          if (!order || !order.id) {
+              console.warn("Invalid order object received");
+              return;
+          }
+
+          if (emptyState) emptyState.style.display = 'none';
+
+          if(document.getElementById('order-' + order.id)) {
+              return; // Prevent duplicates
+          }
+
+          // Construct Items HTML Safely
+          let itemsHtml = '';
+          if (order.items && Array.isArray(order.items)) {
+              order.items.forEach(item => {
+                  let productName = "Unknown Product";
+                  let qty = item.quantity || 1;
+
+                  if (item.product && item.product.name) productName = item.product.name;
+                  else if (item.productName) productName = item.productName;
+
+                  itemsHtml += `
+                      <li class="flex justify-between items-start group/item">
+                          <div class="flex items-start gap-3">
+                              <span class="flex items-center justify-center w-6 h-6 rounded-md bg-brand-teal/20 text-brand-teal font-bold text-sm shrink-0 border border-brand-teal/30">${qty}</span>
+                              <span class="text-stone-200 font-medium leading-snug group-hover/item:text-white transition-colors">${productName}</span>
+                          </div>
+                      </li>`;
+              });
+          } else {
+              itemsHtml = '<li class="text-stone-500 italic text-xs">No items data</li>';
+          }
+
+          // Parse Date
+          const dateObj = parseDate(order.orderDate);
+          const timeStr = !isNaN(dateObj) ? dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+          const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString('bg-BG') : '';
+          const priceStr = order.totalPrice ? Number(order.totalPrice).toFixed(2) : "0.00";
+          const locationStr = order.location || "No Location";
+          const statusStr = order.status || "NEW";
+
+          // Create Card
+          const card = document.createElement('div');
+          card.className = 'group relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col hover:border-brand-teal/50 transition-all duration-300 animate-fade-in-up animate-flash-green';
+          card.id = 'order-' + order.id;
+
+          card.innerHTML = `
+              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-teal to-brand-dark"></div>
+              <div class="p-5 border-b border-stone-800 flex justify-between items-start bg-stone-900/50">
+                  <div>
+                      <div class="flex items-center gap-2 mb-1">
+                          <span class="text-2xl font-serif font-bold text-white">#${order.id}</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium uppercase tracking-wider">
+                          <i class="far fa-clock"></i>
+                          <span>${timeStr}</span>
+                      </div>
+                  </div>
+                  <div class="flex flex-col items-end">
+                       <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal/10 text-brand-teal border border-brand-teal/20 animate-pulse-slow">
+                          ${statusStr}
+                       </span>
+                  </div>
+              </div>
+              <div class="p-5 flex-grow space-y-4">
+                  <div class="flex items-start gap-3 text-sm text-stone-300 bg-stone-800/50 p-3 rounded-lg">
+                       <i class="fas fa-map-marker-alt mt-1 text-brand-gold shrink-0"></i>
+                       <span class="leading-snug font-medium">${locationStr}</span>
+                  </div>
+                  <div class="w-full h-px bg-stone-800"></div>
+                  <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                      ${itemsHtml}
+                  </ul>
+              </div>
+              <div class="p-4 bg-stone-950/30 border-t border-stone-800 flex justify-between items-center">
+                   <span class="text-xs text-stone-500 font-mono">${dateStr}</span>
+                   <span class="text-sm font-serif font-bold text-stone-300">${priceStr} лв.</span>
+              </div>
+          `;
+
+          ordersContainer.prepend(card);
+
+          playNotificationSound();
+          showToast(`Нова поръчка #${order.id}`);
+
+      } catch (e) {
+          console.error("Error parsing/rendering order:", e);
+      }
+  }
+
+  eventSource.onmessage = handleIncomingOrder;
+  eventSource.addEventListener('order', handleIncomingOrder);
+  eventSource.addEventListener('new-order', handleIncomingOrder);
+  eventSource.addEventListener('create', handleIncomingOrder);
+
+  function playNotificationSound() {
+      const playPromise = notificationSound.play();
+      if (playPromise !== undefined) {
+          playPromise.catch(error => {
+              console.log("Sound autoplay blocked. User interaction required.");
+          });
+      }
+  }
+
+  function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl bg-brand-teal text-white transform transition-all duration-500 translate-x-full opacity-0 border border-white/10';
+      toast.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center animate-bounce">
+              <i class="fas fa-bell"></i>
+          </div>
+          <div>
+              <span class="block font-bold text-sm uppercase tracking-wider">Внимание</span>
+              <span class="text-sm font-medium opacity-90">${message}</span>
+          </div>
+      `;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-x-full', 'opacity-0'));
+      setTimeout(() => {
+          toast.classList.add('translate-x-full', 'opacity-0');
+          setTimeout(() => toast.remove(), 500);
+      }, 5000);
+  }
+</script>
+</body>
+</html>
