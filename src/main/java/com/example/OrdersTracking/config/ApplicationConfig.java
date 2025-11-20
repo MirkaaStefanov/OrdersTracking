@@ -54,10 +54,10 @@ public class ApplicationConfig {
         modelMapper.getConfiguration()
                 .setPropertyCondition(context -> {
                     if (context.getParent() != null) {
-
                         String destinationProperty = context.getMapping().getLastDestinationProperty().getName();
-                        return !("id".equals(destinationProperty) ||
-                                "createdAt".equals(destinationProperty) ||
+
+                        // I REMOVED "id".equals(destinationProperty) from the check below
+                        return !("createdAt".equals(destinationProperty) ||
                                 "updatedAt".equals(destinationProperty) ||
                                 "deletedAt".equals(destinationProperty));
                     }
@@ -69,7 +69,6 @@ public class ApplicationConfig {
                 .setSkipNullEnabled(true)
                 .setAmbiguityIgnored(true);
     }
-
 
     @Bean
     public ObjectMapper objectMapper() {

@@ -79,7 +79,7 @@ public class ProductController {
             model.addAttribute("productDTO", productDTO);
             model.addAttribute("categories", MenuCategory.values());
             model.addAttribute("formTitle", "Редакция на продукт");
-            return "admin/product-form"; // Използваме същата форма като за създаване
+            return "admin/product-edit"; // Използваме същата форма като за създаване
         } catch (Exception e) { // Напр. ProductNotFoundException
             return "redirect:/admin/products";
         }

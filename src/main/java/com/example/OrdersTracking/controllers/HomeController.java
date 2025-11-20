@@ -1,5 +1,6 @@
 package com.example.OrdersTracking.controllers;
 
+import com.example.OrdersTracking.enums.MenuCategory;
 import com.example.OrdersTracking.models.Product;
 import com.example.OrdersTracking.services.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class HomeController {
         List<Product> menu = productService.getMenuForOrder();
         model.addAttribute("activePage", "menu");
         model.addAttribute("menu", menu);
+        model.addAttribute("categories", MenuCategory.values());
         return "menu";
     }
 }

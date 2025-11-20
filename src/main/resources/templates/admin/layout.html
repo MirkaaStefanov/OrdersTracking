@@ -1,69 +1,232 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="bg">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${pageTitle ?: 'Административен Панел'}">Администрация</title>
+  <title layout:title-pattern="$CONTENT_TITLE - Админ Панел">Борово Око - Админ</title>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#67b0b6',
+              gold: '#eab308',
+              dark: '#1c2e30',
+              light: '#fcfcfc',
+              muted: '#94a3b8'
+            }
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 1s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
 
+  <style>
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #67b0b6; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4a8e94; }
+    html { scroll-behavior: smooth; }
+  </style>
 </head>
-<body>
+<body class="bg-stone-50 text-stone-800 antialiased font-sans min-h-screen flex flex-col pt-24">
 
-<header>
-  <nav>
-    <div class="logo">
-      Борово Око<span>.</span>
+<!-- Admin Header -->
+<header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3 shadow-xl border-b border-white/10 bg-brand-dark/95 backdrop-blur-md"
+        id="navbar-container">
+  <div class="container mx-auto px-6 flex items-center justify-between">
+
+    <!-- Logo Section (Matched to Public Header Design) -->
+    <a th:href="@{/admin/products}" class="flex items-center gap-3 cursor-pointer group z-50 relative">
+      <div class="h-10 w-10 md:h-12 md:w-12 rounded-full border-2 border-brand-teal flex items-center justify-center overflow-hidden transition-all duration-300 bg-white">
+        <img src="https://placehold.co/100x100/67b0b6/ffffff?text=B"
+             th:src="@{/images/logo.png}"
+             onerror="this.src='https://placehold.co/100x100/67b0b6/ffffff?text=B'"
+             alt="Logo"
+             class="w-full h-full object-cover"/>
+      </div>
+
+      <div class="flex flex-col">
+                 <span class="text-lg md:text-2xl font-serif font-bold tracking-wider leading-none text-white group-hover:text-brand-teal transition-colors">
+                   БОРОВО ОКО
+                 </span>
+        <span class="text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.2em] text-brand-teal">
+                   Admin Panel
+                 </span>
+      </div>
+    </a>
+
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex items-center gap-8">
+      <a th:href="@{/}" class="nav-link-text text-sm font-medium uppercase tracking-widest text-stone-400 hover:text-white transition-colors relative group">
+        <i class="fas fa-globe mr-1"></i> Публичен Сайт
+      </a>
+
+      <div class="h-6 w-[1px] bg-white/10"></div>
+
+      <a th:href="@{/admin/products}"
+         class="admin-nav-link nav-link-text text-sm font-medium uppercase tracking-widest text-white hover:text-brand-teal transition-colors relative group"
+         data-path="/products">
+        Продукти
+        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all duration-300 group-hover:w-full"></span>
+      </a>
+
+      <a th:href="@{/admin/orders}"
+         class="admin-nav-link nav-link-text text-sm font-medium uppercase tracking-widest text-white hover:text-brand-teal transition-colors relative group"
+         data-path="/orders">
+        Поръчки
+        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all duration-300 group-hover:w-full"></span>
+      </a>
+
+      <a th:href="@{/admin/users}"
+         class="admin-nav-link nav-link-text text-sm font-medium uppercase tracking-widest text-white hover:text-brand-teal transition-colors relative group"
+         data-path="/users">
+        Потребители
+        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all duration-300 group-hover:w-full"></span>
+      </a>
+
+      <!-- Auth Section -->
+      <div class="flex items-center gap-4 ml-4">
+        <div sec:authorize="isAuthenticated()" class="relative group">
+          <button class="nav-link-text text-white hover:text-brand-teal transition-colors flex items-center gap-2 text-sm font-medium uppercase tracking-widest">
+            <div class="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center border-2 border-brand-dark shadow-md">
+              <i class="fas fa-user-shield text-xs"></i>
+            </div>
+            <span sec:authentication="name">Admin</span>
+          </button>
+          <!-- Dropdown -->
+          <div class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-stone-800 border border-stone-100">
+            <div class="px-4 py-2 text-xs text-stone-400 border-b border-stone-100 mb-1">Администратор</div>
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-medium">
+                <i class="fas fa-sign-out-alt mr-2"></i> Изход
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <button class="hamburger" id="hamburger-btn">
-      <span></span>
-      <span></span>
-      <span></span>
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden text-white hover:text-brand-teal transition-colors p-1 focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
     </button>
-
-    <ul class="nav-links" id="nav-menu">
-      <li><a href="/admin/products"><i class="fas fa-utensils"></i> Продукти</a></li>
-      <li><a href="/admin/orders"><i class="fas fa-clipboard-list"></i> Поръчки</a></li>
-      <li><a href="/admin/users"><i class="fas fa-users"></i> Потребители</a></li>
-      <li><a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Изход</a></li>
-    </ul>
-  </nav>
+  </div>
 </header>
 
-<main class="main-container">
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu-overlay" class="fixed inset-0 z-[60] bg-brand-dark transition-transform duration-500 ease-in-out translate-x-full flex flex-col md:hidden">
+  <div class="flex justify-end p-6">
+    <button id="close-mobile-menu" class="text-white/60 hover:text-white transition-colors p-2">
+      <i class="fas fa-times text-3xl"></i>
+    </button>
+  </div>
 
-  <div th:if="${success != null}" class="alert alert-success" role="alert">
-    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+  <div class="flex-grow flex flex-col items-center justify-center gap-8 text-white pb-20">
+    <div class="flex flex-col items-center mb-6">
+      <div class="w-16 h-16 rounded-full bg-brand-teal text-white flex items-center justify-center text-2xl mb-2">
+        <i class="fas fa-user-shield"></i>
+      </div>
+      <span sec:authentication="name" class="font-bold text-xl">Admin</span>
+    </div>
+
+    <a th:href="@{/admin/products}" class="text-2xl font-serif font-bold tracking-wide hover:text-brand-teal transition-all">Продукти</a>
+    <a th:href="@{/admin/orders}" class="text-2xl font-serif font-bold tracking-wide hover:text-brand-teal transition-all">Поръчки</a>
+    <a th:href="@{/admin/users}" class="text-2xl font-serif font-bold tracking-wide hover:text-brand-teal transition-all">Потребители</a>
+    <a th:href="@{/}" class="text-lg text-stone-400 hover:text-white transition-all"><i class="fas fa-globe mr-2"></i> Публичен Сайт</a>
+
+    <div class="w-16 h-1 bg-brand-teal/30 rounded-full my-4"></div>
+
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="text-xl uppercase tracking-widest text-red-400 hover:text-red-300 transition-all bg-transparent border-none cursor-pointer">
+        <i class="fas fa-sign-out-alt mr-2"></i> Изход
+      </button>
+    </form>
   </div>
-  <div th:if="${error != null}" class="alert alert-error" role="alert">
-    <i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+</div>
+
+<main class="flex-grow container mx-auto px-4 py-8 md:py-12">
+
+  <!-- Alerts -->
+  <div th:if="${success != null}" class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-sm flex items-center gap-3 animate-fade-in-up">
+    <div class="text-green-500"><i class="fas fa-check-circle text-xl"></i></div>
+    <div class="text-green-700 font-medium" th:text="${success}"></div>
   </div>
 
-  <div class="content-card">
-    <th:block layout:fragment="content"></th:block>
+  <div th:if="${error != null}" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm flex items-center gap-3 animate-fade-in-up">
+    <div class="text-red-500"><i class="fas fa-exclamation-triangle text-xl"></i></div>
+    <div class="text-red-700 font-medium" th:text="${error}"></div>
   </div>
+
+  <th:block layout:fragment="content"></th:block>
+
 </main>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const navMenu = document.getElementById('nav-menu');
+<footer class="bg-white border-t border-stone-200 py-6 mt-auto">
+  <div class="container mx-auto px-6 text-center text-xs text-stone-400">
+    &copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> Борово Око - Административен панел.
+  </div>
+</footer>
 
-    if (hamburgerBtn && navMenu) {
-      hamburgerBtn.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        hamburgerBtn.classList.toggle('active');
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const closeBtn = document.getElementById('close-mobile-menu');
+  const menu = document.getElementById('mobile-menu-overlay');
+
+  if(btn && menu && closeBtn) {
+      btn.addEventListener('click', () => {
+          menu.classList.remove('translate-x-full');
+          menu.classList.add('translate-x-0');
       });
-    }
+      closeBtn.addEventListener('click', () => {
+          menu.classList.add('translate-x-full');
+          menu.classList.remove('translate-x-0');
+      });
+  }
+
+  // Highlight Active Admin Link
+  document.addEventListener('DOMContentLoaded', () => {
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('.admin-nav-link').forEach(link => {
+          if(currentPath.includes(link.getAttribute('data-path'))) {
+              link.classList.remove('text-white');
+              link.classList.add('text-brand-teal');
+              const span = link.querySelector('span');
+              if(span) span.classList.add('w-full');
+          }
+      });
   });
 </script>
-
 </body>
 </html>

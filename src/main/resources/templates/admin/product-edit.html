@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/layout}">
 <head>
-  <title th:text="${formTitle}">Форма Продукт</title>
+  <title th:text="${formTitle}">Редакция Продукт</title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -13,7 +13,7 @@
 
     <!-- Header -->
     <div class="mb-8 text-center">
-      <h1 class="text-3xl font-serif font-bold text-brand-dark mb-2" th:text="${formTitle}">Създаване на продукт</h1>
+      <h1 class="text-3xl font-serif font-bold text-brand-dark mb-2" th:text="${formTitle}">Редакция на продукт</h1>
       <div class="h-1 w-20 bg-brand-teal mx-auto rounded-full"></div>
     </div>
 
@@ -21,18 +21,20 @@
     <div class="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-stone-100 relative overflow-hidden">
       <div class="absolute top-0 left-0 w-full h-2 bg-brand-teal"></div>
 
-      <form th:action="@{/admin/products/save}"
+      <!-- Update Form -->
+      <form th:action="@{/admin/products/update/{id}(id=${productDTO.id})}"
             th:object="${productDTO}"
             method="post"
             class="space-y-6">
+
+        <input type="hidden" th:field="*{id}" />
 
         <!-- Name -->
         <div>
           <label for="name" class="block text-xs uppercase tracking-widest text-stone-500 mb-2 font-semibold">Име на продукт</label>
           <div class="relative">
             <input type="text" id="name" th:field="*{name}" required
-                   class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all text-stone-700 placeholder-stone-400"
-                   placeholder="Напр. Шопска салата" />
+                   class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all text-stone-700 placeholder-stone-400" />
           </div>
         </div>
 
@@ -40,8 +42,7 @@
         <div>
           <label for="description" class="block text-xs uppercase tracking-widest text-stone-500 mb-2 font-semibold">Описание</label>
           <textarea id="description" th:field="*{description}" rows="3"
-                    class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all text-stone-700 placeholder-stone-400"
-                    placeholder="Съставки, алергени..."></textarea>
+                    class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all text-stone-700 placeholder-stone-400"></textarea>
         </div>
 
         <!-- Category -->
@@ -91,7 +92,7 @@
         <!-- Actions -->
         <div class="flex flex-col md:flex-row gap-4 pt-6 border-t border-stone-100 mt-6">
           <button type="submit" class="flex-1 bg-brand-dark text-white font-bold py-4 rounded-xl hover:bg-brand-teal transition-all shadow-lg transform hover:-translate-y-1 flex justify-center items-center gap-2">
-            <i class="fas fa-plus-circle"></i> <span>Създай Продукт</span>
+            <i class="fas fa-save"></i> <span>Обнови Продукта</span>
           </button>
           <a th:href="@{/admin/products}" class="flex-1 bg-stone-100 text-stone-600 font-bold py-4 rounded-xl hover:bg-stone-200 transition-colors flex justify-center items-center gap-2">
             <i class="fas fa-times"></i> Отказ
