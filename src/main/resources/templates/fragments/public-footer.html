@@ -2,46 +2,98 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="bg">
 <body>
 
-<footer class="site-footer" th:fragment="footer">
-    <div class="container">
+<footer th:fragment="footer" class="bg-stone-950 text-stone-400 py-20 border-t border-stone-900 font-sans" id="contact">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 
-        <div>
-            <div class="footer-logo">Борово Око<span>.</span></div>
-            <p style="color: #f1f5f9; line-height: 1.7; margin-top: 1rem;">
-                Вкусен обяд край езерото. <br>
-                Насладете се на качествена храна сред природата.
-            </p>
-        </div>
+            <!-- Brand -->
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-white mb-1">БОРОВО ОКО</h2>
+                    <span class="text-brand-teal text-xs tracking-[0.3em] uppercase">Restaurant</span>
+                </div>
+                <p class="text-sm leading-relaxed text-stone-500 max-w-xs">
+                    Вкусен обяд край езерото. Насладете се на качествена храна сред природата.
+                </p>
+                <div class="flex gap-4 pt-2">
+                    <a href="https://facebook.com" target="_blank" class="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center hover:bg-brand-teal hover:text-white transition-all duration-300 group">
+                        <i class="fab fa-facebook-f text-sm"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center hover:bg-brand-teal hover:text-white transition-all duration-300 group">
+                        <i class="fab fa-instagram text-sm"></i>
+                    </a>
+                </div>
+            </div>
 
-        <div>
-            <h4>Контакти</h4>
-            <ul>
-                <li>
-                    <a href="tel:+359123456789"> <i class="fas fa-phone-alt"></i> +359 123 456 789
-                    </a>
-                </li>
-                <li>
-                    <a href="mailto:contact@borovo-oko.bg"> <i class="fas fa-envelope"></i> contact@borovo-oko.bg
-                    </a>
-                </li>
-                <li>
-                    <a href="https://maps.google.com/?q=Парк+Борово+Око+Търговище" target="_blank"> <i class="fas fa-map-marker-alt"></i> Парк "Борово Око", Търговище
-                    </a>
-                </li>
-            </ul>
-        </div>
+            <!-- Contact -->
+            <div class="space-y-6">
+                <h3 class="text-white font-medium uppercase tracking-widest text-xs border-b border-stone-800 pb-4 inline-block">Контакти</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-4 group">
+                        <div class="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center shrink-0 group-hover:text-brand-teal transition-colors">
+                            <i class="fas fa-map-marker-alt text-xs"></i>
+                        </div>
+                        <a href="https://maps.google.com/?q=Парк+Борово+Око+Търговище" target="_blank" class="text-sm group-hover:text-stone-300 transition-colors hover:underline">
+                            Парк "Борово Око",<br/>Търговище
+                        </a>
+                    </li>
+                    <li class="flex items-center gap-4 group">
+                        <div class="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center shrink-0 group-hover:text-brand-teal transition-colors">
+                            <i class="fas fa-phone-alt text-xs"></i>
+                        </div>
+                        <a href="tel:+359123456789" class="text-sm group-hover:text-stone-300 transition-colors hover:underline">+359 123 456 789</a>
+                    </li>
+                    <li class="flex items-center gap-4 group">
+                        <div class="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center shrink-0 group-hover:text-brand-teal transition-colors">
+                            <i class="fas fa-envelope text-xs"></i>
+                        </div>
+                        <a href="mailto:contact@borovo-oko.bg" class="text-sm group-hover:text-stone-300 transition-colors hover:underline">contact@borovo-oko.bg</a>
+                    </li>
+                </ul>
+            </div>
 
-        <div>
-            <h4>Последвайте ни</h4>
-            <p>Вижте най-новите ни ястия и промоции.</p>
-            <div class="social-icons">
-                <a href="httpsPOST" target="_blank" title="Facebook"> <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://www.instagram.com" target="_blank" title="Instagram"> <i class="fab fa-instagram"></i>
+            <!-- Hours -->
+            <div class="space-y-6">
+                <h3 class="text-white font-medium uppercase tracking-widest text-xs border-b border-stone-800 pb-4 inline-block">Работно Време</h3>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex justify-between items-center border-b border-stone-900 pb-2">
+                        <span>Понеделник - Петък</span>
+                        <span class="text-white font-medium">10:00 - 23:00</span>
+                    </li>
+                    <li class="flex justify-between items-center border-b border-stone-900 pb-2">
+                        <span>Събота</span>
+                        <span class="text-white font-medium">09:00 - 00:00</span>
+                    </li>
+                    <li class="flex justify-between items-center pb-2">
+                        <span>Неделя</span>
+                        <span class="text-white font-medium">09:00 - 23:00</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Map Image Placeholder -->
+            <div class="h-56 bg-stone-900 rounded-2xl overflow-hidden relative group cursor-pointer border border-stone-800">
+                <img
+                        src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1774&q=80"
+                        alt="Map location"
+                        class="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-all duration-500 group-hover:scale-110"
+                />
+                <a href="https://maps.google.com/?q=Парк+Борово+Око+Търговище" target="_blank" class="absolute inset-0 flex items-center justify-center">
+              <span class="bg-brand-teal text-white px-6 py-2 rounded-full text-xs font-bold shadow-lg transform group-hover:-translate-y-1 transition-transform duration-300 flex items-center gap-2">
+                <i class="fas fa-map-marker-alt"></i> Карта
+              </span>
                 </a>
             </div>
+
         </div>
 
+        <div class="border-t border-stone-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-stone-600">
+            <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> Ресторант Борово Око. Всички права запазени.</p>
+            <div class="flex gap-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-white transition-colors">Политика за поверителност</a>
+                <a href="#" class="hover:text-white transition-colors">Общи условия</a>
+            </div>
+        </div>
     </div>
 </footer>
 

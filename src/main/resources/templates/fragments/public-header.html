@@ -2,29 +2,142 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="bg">
 <body>
 
-<header class="public-nav" th:fragment="header" id="publicNav"> <div class="nav-content">
-    <a th:href="@{/}" class="logo">Борово Око<span>.</span></a>
-    <div class="nav-links">
+<!-- Using th:block allows us to output the header and the overlay as siblings in the DOM,
+     solving the stacking context issue caused by backdrop-blur on the header -->
+<th:block th:fragment="header">
 
-        <a th:href="@{/menu}"
-           th:classappend="${activePage == 'menu' ? 'active' : ''}">Меню</a>
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 md:py-6 bg-gradient-to-b from-black/60 to-transparent"
+            id="navbar-container">
+        <div class="container mx-auto px-6 flex items-center justify-between">
 
-        <div class="cart-icon-wrapper">
-            <a th:href="@{/cart}" class="cart-icon" title="Количка"
-               th:classappend="${activePage == 'cart' ? 'active' : ''}">
-                <i class="fas fa-shopping-cart"></i>
+            <!-- Logo Section -->
+            <a th:href="@{/}" class="flex items-center gap-3 cursor-pointer group z-50 relative">
+                <!-- LOGO PLACEHOLDER START -->
+                <div id="logo-border" class="h-10 w-10 md:h-12 md:w-12 rounded-full border-2 border-white/80 flex items-center justify-center overflow-hidden transition-all duration-300">
+                    <img th:src="@{/images/Görüntü 1.jpeg}"
+                         src="https://placehold.co/100x100/67b0b6/ffffff?text=Logo"
+                         alt="Logo"
+                         class="w-full h-full object-cover"
+                         onerror="this.src='https://placehold.co/100x100/67b0b6/ffffff?text=Logo'"/>
+                </div>
+                <!-- LOGO PLACEHOLDER END -->
+
+                <div class="flex flex-col">
+                 <span class="brand-text text-lg md:text-2xl font-serif font-bold tracking-wider leading-none text-white group-hover:text-brand-teal transition-colors">
+                   БОРОВО ОКО
+                 </span>
+                    <span class="brand-sub text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.2em] text-gray-300">
+                   Restaurant
+                 </span>
+                </div>
             </a>
 
-            <span class="cart-quantity-badge"
-                  th:if="${cartItemCount != null and cartItemCount > 0}"
-                  th:text="${cartItemCount}">
-                    0
-                </span>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8">
+                <a th:href="@{/}" class="nav-link-text text-sm font-medium uppercase tracking-widest text-white hover:text-brand-teal transition-colors relative group">
+                    Начало
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+
+                <a th:href="@{/menu}"
+                   th:classappend="${activePage == 'menu' ? 'text-brand-teal' : 'text-white'}"
+                   class="nav-link-text text-sm font-medium uppercase tracking-widest hover:text-brand-teal transition-colors relative group">
+                    Меню
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+
+                <!-- Desktop Cart Icon -->
+                <div class="relative">
+                    <a th:href="@{/cart}"
+                       th:classappend="${activePage == 'cart' ? 'text-brand-teal' : 'text-white'}"
+                       class="nav-link-text hover:text-brand-teal transition-colors"
+                       title="Количка">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                    </a>
+                    <span th:if="${cartItemCount != null and cartItemCount > 0}"
+                          th:text="${cartItemCount}"
+                          class="cart-count-badge absolute -top-2 -right-3 bg-brand-gold text-brand-dark text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                    </span>
+                    <span class="cart-count-badge hidden absolute -top-2 -right-3 bg-brand-gold text-brand-dark text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm"
+                          th:unless="${cartItemCount != null and cartItemCount > 0}">
+                        0
+                    </span>
+                </div>
+
+                <a href="#contact" class="bg-brand-teal text-white px-6 py-2 rounded-full font-medium hover:bg-brand-teal/80 transition-all transform hover:scale-105 shadow-lg flex items-center gap-2 border border-transparent hover:border-white/20 text-sm">
+                    <i class="fas fa-phone-alt text-xs"></i>
+                    Резервация
+                </a>
+            </div>
+
+            <!-- Mobile Controls (Cart + Hamburger) -->
+            <div class="flex items-center gap-6 md:hidden z-50">
+
+                <!-- Mobile Cart Icon (Always Visible) -->
+                <div class="relative">
+                    <a th:href="@{/cart}" class="text-white hover:text-brand-teal transition-colors inline-flex p-1">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </a>
+                    <span th:if="${cartItemCount != null and cartItemCount > 0}"
+                          th:text="${cartItemCount}"
+                          class="cart-count-badge absolute -top-2 -right-2 bg-brand-gold text-brand-dark text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-brand-dark">
+                    </span>
+                    <span class="cart-count-badge hidden absolute -top-2 -right-2 bg-brand-gold text-brand-dark text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm"
+                          th:unless="${cartItemCount != null and cartItemCount > 0}">
+                        0
+                    </span>
+                </div>
+
+                <!-- Hamburger Button -->
+                <button id="mobile-menu-btn" class="text-white hover:text-brand-teal transition-colors focus:outline-none p-1">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <!-- Moved outside the <header> tag so that backdrop-filters on header don't break the fixed positioning context -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 z-[60] bg-brand-dark transition-transform duration-500 ease-in-out translate-x-full flex flex-col">
+
+        <!-- Close Button Area -->
+        <div class="flex justify-end p-6">
+            <button id="close-mobile-menu" class="text-white/60 hover:text-white transition-colors p-2">
+                <i class="fas fa-times text-3xl"></i>
+            </button>
         </div>
 
+        <!-- Menu Links Centered -->
+        <div class="flex-grow flex flex-col items-center justify-center gap-8 text-white pb-20">
+            <a th:href="@{/}" class="text-3xl font-serif font-bold tracking-wide hover:text-brand-teal transition-all transform hover:translate-x-2">Начало</a>
+            <a th:href="@{/menu}" class="text-3xl font-serif font-bold tracking-wide hover:text-brand-teal transition-all transform hover:translate-x-2">Меню</a>
+            <a th:href="@{/cart}" class="text-3xl font-serif font-bold tracking-wide hover:text-brand-teal transition-all transform hover:translate-x-2 flex items-center gap-3">
+                Количка
+                <span class="cart-count-badge bg-brand-gold text-brand-dark text-base font-bold px-2 py-0.5 rounded-full"
+                      th:if="${cartItemCount != null and cartItemCount > 0}"
+                      th:text="${cartItemCount}"></span>
+            </a>
+
+            <div class="w-16 h-1 bg-brand-teal/30 rounded-full my-6"></div>
+
+            <div class="flex flex-col gap-6 items-center mt-4 text-lg">
+                <div class="flex items-center gap-3 text-gray-300">
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-brand-teal">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <span>Търговище, България</span>
+                </div>
+                <div class="flex items-center gap-3 text-gray-300">
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-brand-teal">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <span>+359 89 123 4567</span>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-</header>
+
+</th:block>
 
 </body>
 </html>

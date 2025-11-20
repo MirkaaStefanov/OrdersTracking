@@ -7,15 +7,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Борово Око</title>
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <link rel="stylesheet" th:href="@{/css/public-styles.css}">
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                serif: ['"Cormorant Garamond"', 'serif'],
+                sans: ['"Montserrat"', 'sans-serif'],
+              },
+              colors: {
+                brand: {
+                  teal: '#67b0b6',
+                  gold: '#eab308',
+                  dark: '#1c2e30',
+                  light: '#fcfcfc',
+                  muted: '#94a3b8'
+                }
+              },
+              animation: {
+                'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                'fade-in': 'fadeIn 1.5s ease-out forwards',
+                'scale-slow': 'scaleSlow 20s linear infinite alternate',
+                'spin-slow': 'spin 15s linear infinite',
+                'float': 'float 6s ease-in-out infinite',
+                'shimmer': 'shimmer 8s ease-in-out infinite',
+              },
+              keyframes: {
+                fadeInUp: {
+                  '0%': { opacity: '0', transform: 'translateY(20px)' },
+                  '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+                },
+                scaleSlow: {
+                  '0%': { transform: 'scale(1)' },
+                  '100%': { transform: 'scale(1.1)' },
+                },
+                float: {
+                  '0%, 100%': { transform: 'translateY(0)' },
+                  '50%': { transform: 'translateY(-10px)' },
+                },
+                shimmer: {
+                  '0%': { backgroundPosition: '0% 50%' },
+                  '50%': { backgroundPosition: '100% 50%' },
+                  '100%': { backgroundPosition: '0% 50%' }
+                }
+              }
+            }
+          }
+        }
+    </script>
+
+    <!-- Global Styles -->
+    <style>
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #67b0b6;
+          border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #4a8e94;
+        }
+        html {
+          scroll-behavior: smooth;
+        }
+        .bg-300\% {
+          background-size: 300% auto;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-stone-50 text-stone-800 antialiased overflow-x-hidden">
 
 <th:block th:replace="~{fragments/public-header :: header}"></th:block>
 
@@ -25,18 +105,64 @@
 
 <th:block th:replace="~{fragments/public-footer :: footer}"></th:block>
 
+<!-- Navbar Logic -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const nav = document.getElementById('publicNav');
-      if (nav) {
+        const nav = document.getElementById('navbar-container');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu-overlay');
+        const closeBtn = document.getElementById('close-mobile-menu');
+        const brandTexts = document.querySelectorAll('.brand-text');
+        const brandSub = document.querySelector('.brand-sub');
+        const navLinks = document.querySelectorAll('.nav-link-text');
+        const logoBorder = document.getElementById('logo-border');
+
+        // Scroll Effect
         window.addEventListener('scroll', () => {
-          if (window.scrollY > 50) { // Колко да скролне преди да се появи
-            nav.classList.add('nav-scrolled');
-          } else {
-            nav.classList.remove('nav-scrolled');
-          }
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-brand-dark/90', 'backdrop-blur-md', 'py-3', 'shadow-xl', 'border-b', 'border-white/10');
+                nav.classList.remove('py-6', 'bg-gradient-to-b', 'from-black/60', 'to-transparent');
+
+                // Text Color Changes
+                brandTexts.forEach(el => el.classList.remove('text-white'));
+                brandTexts.forEach(el => el.classList.add('text-white'));
+
+                if(brandSub) {
+                    brandSub.classList.remove('text-gray-300');
+                    brandSub.classList.add('text-brand-teal');
+                }
+
+                logoBorder.classList.remove('border-white/80');
+                logoBorder.classList.add('border-brand-teal');
+
+            } else {
+                nav.classList.remove('bg-brand-dark/90', 'backdrop-blur-md', 'py-3', 'shadow-xl', 'border-b', 'border-white/10');
+                nav.classList.add('py-6', 'bg-gradient-to-b', 'from-black/60', 'to-transparent');
+
+                brandTexts.forEach(el => el.classList.add('text-white'));
+
+                if(brandSub) {
+                    brandSub.classList.add('text-gray-300');
+                    brandSub.classList.remove('text-brand-teal');
+                }
+
+                logoBorder.classList.add('border-white/80');
+                logoBorder.classList.remove('border-brand-teal');
+            }
         });
-      }
+
+        // Mobile Menu Toggle
+        if(mobileBtn && mobileMenu && closeBtn) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('translate-x-0');
+            });
+
+            closeBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenu.classList.remove('translate-x-0');
+            });
+        }
     });
 </script>
 

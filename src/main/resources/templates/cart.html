@@ -3,89 +3,215 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{fragments/public-layout}">
 <head>
-    <title>Количка</title>
+    <title>Количка - Борово Око</title>
 </head>
 <body>
 
 <div layout:fragment="content">
 
-    <div class="container" style="padding-top: 3rem; padding-bottom: 3rem;">
-        <h1>Вашата Количка</h1>
+    <!-- Header Section -->
+    <section class="relative py-20 bg-brand-dark text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#67b0b6 1px, transparent 1px); background-size: 30px 30px;"></div>
 
-        <div th:if="${cart == null or cart.cartItems.isEmpty()}" class="cart-empty-message">
-            <h2><i class="fas fa-shopping-cart" style="margin-right: 10px;"></i> Количката ви е празна.</h2>
-            <p>Нямате добавени продукти. Моля, върнете се в менюто, за да добавите.</p>
-            <a th:href="@{/menu}" class="btn btn-primary" style="margin-top: 1rem;">
-                <i class="fas fa-utensils" style="margin-right: 5px;"></i> Към Менюто
-            </a>
-        </div>
-
-        <div class="cart-wrapper" th:unless="${cart == null or cart.cartItems.isEmpty()}">
-
-            <div class="cart-items-table">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Продукт</th>
-                        <th>Ед. Цена</th>
-                        <th>Количество</th>
-                        <th>Общо</th>
-                        <th></th> </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="item : ${cart.cartItems}">
-
-                        <td style="font-weight: 600;" th:text="${item.product.name}">
-                            Пилешка супа
-                        </td>
-
-                        <td th:text="${#numbers.formatDecimal(item.product.price, 1, 2)} + ' лв.'">
-                            4.90 лв.
-                        </td>
-
-                        <td class="cart-item-quantity">
-                            <span th:text="${item.quantity}">2</span>
-                        </td>
-
-                        <td style="font-weight: 700;"
-                            th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)} + ' лв.'">
-                            9.80 лв.
-                        </td>
-
-                        <td>
-                            <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post">
-                                <button type="submit" class="btn-remove" title="Премахни">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div class="inline-block border border-brand-teal/30 px-4 py-1 rounded-full mb-4">
+                <span class="text-brand-teal text-xs uppercase tracking-widest font-bold">Вашата поръчка</span>
             </div>
+            <h1 class="text-4xl md:text-6xl font-serif font-bold mb-4">Количка</h1>
+        </div>
+    </section>
 
-            <div class="cart-summary">
-                <h3>Обобщение</h3>
+    <section class="relative py-16 bg-stone-50 min-h-[50vh]">
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-0 left-0 w-[300px] h-[300px] bg-brand-teal/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
 
-                <div class="summary-row">
-                    <span>Междинна сума</span>
-                    <span th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
+        <div class="container mx-auto px-6 relative z-10">
+
+            <!-- Empty State -->
+            <div th:if="${cart == null or cart.cartItems.isEmpty()}" class="text-center py-16 max-w-lg mx-auto">
+                <div class="w-24 h-24 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6 text-stone-300">
+                    <i class="fas fa-shopping-basket text-4xl"></i>
                 </div>
-
-                <div class="summary-row">
-                    <span>Доставка</span>
-                    <span>Безплатна</span>
-                </div>
-
-                <div class="summary-row total">
-                    <span>Общо</span>
-                    <span th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
-                </div>
-
-                <a th:href="@{/checkout}" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1rem; padding: 1rem;">
-                    Към Плащане
+                <h2 class="text-3xl font-serif font-bold text-brand-dark mb-4">Количката е празна</h2>
+                <p class="text-stone-500 mb-8 leading-relaxed">Все още не сте избрали нищо от нашето меню. Разгледайте предложенията ни и изберете нещо вкусно.</p>
+                <a th:href="@{/menu}" class="inline-block bg-brand-teal text-white px-8 py-3 rounded-full font-semibold hover:bg-brand-dark transition-all shadow-lg transform hover:-translate-y-1">
+                    Към Менюто
                 </a>
             </div>
-        </div> </div> </div>
+
+            <!-- Cart Content -->
+            <div th:unless="${cart == null or cart.cartItems.isEmpty()}" class="flex flex-col lg:flex-row gap-12">
+
+                <!-- Cart Items List -->
+                <div class="lg:w-2/3">
+                    <div class="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
+
+                        <!-- List Header (Desktop Only) -->
+                        <div class="hidden md:grid grid-cols-12 bg-stone-50 border-b border-stone-100 py-4 px-6 text-xs uppercase tracking-widest text-stone-500 font-semibold">
+                            <div class="col-span-5">Продукт / Ед. Цена</div>
+                            <div class="col-span-3 text-center">Количество</div>
+                            <div class="col-span-3 text-right">Общо</div>
+                            <div class="col-span-1"></div>
+                        </div>
+
+                        <!-- Items Loop -->
+                        <div class="divide-y divide-stone-100">
+                            <div th:each="item : ${cart.cartItems}" class="p-4 md:p-6 hover:bg-stone-50/30 transition-colors">
+
+                                <!-- Mobile Layout: Compact Rectangle Row -->
+                                <div class="flex md:hidden justify-between items-start gap-3">
+                                    <!-- Left: Product Info -->
+                                    <div class="flex flex-col gap-1 flex-grow">
+                                        <h4 class="font-serif font-bold text-brand-dark text-base leading-tight" th:text="${item.product.name}">Пилешка супа</h4>
+                                        <div class="text-xs text-stone-500 font-medium mt-1">
+                                            <span th:text="${#numbers.formatDecimal(item.product.price, 1, 2)} + ' лв.'">4.90 лв.</span>
+                                            <span class="text-stone-300 mx-1">|</span>
+                                            <span th:text="${#numbers.formatDecimal(item.product.euroPrice, 1, 2)} + ' €'">2.50 €</span>
+                                        </div>
+                                        <div class="mt-2 text-brand-teal font-bold text-sm" th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)} + ' лв.'">9.80 лв.</div>
+                                    </div>
+
+                                    <!-- Right: Controls -->
+                                    <div class="flex flex-col items-end justify-between gap-4">
+                                        <!-- Delete Button -->
+                                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post">
+                                            <button type="submit" class="text-stone-300 hover:text-red-500 p-1 -mr-1">
+                                                <i class="fas fa-trash-alt text-xs"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Quantity Controls -->
+                                        <div class="flex items-center border border-stone-200 rounded-full h-7 bg-white shadow-sm">
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                                <input type="hidden" name="quantity" th:value="${item.quantity - 1}" />
+                                                <button type="submit" class="w-7 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal"
+                                                        th:disabled="${item.quantity <= 1}"
+                                                        th:classappend="${item.quantity <= 1 ? 'opacity-30' : ''}">
+                                                    <i class="fas fa-minus text-[9px]"></i>
+                                                </button>
+                                            </form>
+                                            <span class="w-6 text-center font-bold text-brand-dark text-xs" th:text="${item.quantity}">2</span>
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                                <input type="hidden" name="quantity" th:value="${item.quantity + 1}" />
+                                                <button type="submit" class="w-7 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal">
+                                                    <i class="fas fa-plus text-[9px]"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Desktop Layout: Grid -->
+                                <div class="hidden md:grid grid-cols-12 items-center">
+                                    <!-- 1. Info -->
+                                    <div class="col-span-5">
+                                        <h4 class="font-serif font-bold text-brand-dark text-xl" th:text="${item.product.name}">Пилешка супа</h4>
+                                        <div class="text-sm mt-1 flex items-center gap-2 text-stone-500">
+                                            <span class="font-medium text-stone-700" th:text="${#numbers.formatDecimal(item.product.price, 1, 2)} + ' лв.'">4.90 лв.</span>
+                                            <span class="text-stone-300">|</span>
+                                            <span th:text="${#numbers.formatDecimal(item.product.euroPrice, 1, 2)} + ' €'">2.50 €</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Quantity -->
+                                    <div class="col-span-3 flex justify-center">
+                                        <div class="flex items-center border border-stone-200 rounded-full h-10 bg-white shadow-sm">
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                                <input type="hidden" name="quantity" th:value="${item.quantity - 1}" />
+                                                <button type="submit" class="w-10 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal transition-colors"
+                                                        th:disabled="${item.quantity <= 1}"
+                                                        th:classappend="${item.quantity <= 1 ? 'opacity-30 cursor-not-allowed' : ''}">
+                                                    <i class="fas fa-minus text-xs"></i>
+                                                </button>
+                                            </form>
+
+                                            <span class="w-8 text-center font-bold text-brand-dark text-sm" th:text="${item.quantity}">2</span>
+
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                                <input type="hidden" name="quantity" th:value="${item.quantity + 1}" />
+                                                <button type="submit" class="w-10 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal transition-colors">
+                                                    <i class="fas fa-plus text-xs"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Total -->
+                                    <div class="col-span-3 text-right">
+                                        <span class="block text-brand-teal font-bold text-lg" th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)} + ' лв.'">9.80 лв.</span>
+                                        <span class="block text-xs text-stone-400 font-medium"
+                                              th:text="${#numbers.formatDecimal(item.product.euroPrice * item.quantity, 1, 2)} + ' €'">
+                                            5.00 €
+                                        </span>
+                                    </div>
+
+                                    <!-- 4. Remove -->
+                                    <div class="col-span-1 flex justify-end">
+                                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post">
+                                            <button type="submit" class="w-8 h-8 rounded-full hover:bg-red-50 text-stone-300 hover:text-red-500 transition-all flex items-center justify-center" title="Премахни">
+                                                <i class="fas fa-trash-alt text-sm"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <a th:href="@{/menu}" class="inline-flex items-center gap-2 text-brand-teal font-medium hover:text-brand-dark transition-colors">
+                            <i class="fas fa-arrow-left"></i> Обратно към менюто
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Summary Sidebar -->
+                <div class="lg:w-1/3">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-stone-100 sticky top-32">
+                        <h3 class="text-2xl font-serif font-bold text-brand-dark mb-6 border-b border-stone-100 pb-4">Обобщение</h3>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between text-stone-600">
+                                <span>Междинна сума</span>
+                                <span class="font-medium" th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
+                            </div>
+                            <!-- Approximate Total in Euro for display -->
+                            <div class="flex justify-between text-stone-400 text-sm">
+                                <span>(в евро)</span>
+                                <span class="font-medium" th:text="'~' + ${#numbers.formatDecimal(totalPrice / 1.95583, 1, 2)} + ' €'">0.00 €</span>
+                            </div>
+                            <div class="flex justify-between text-stone-600 pt-2">
+                                <span>Доставка</span>
+                                <span class="text-green-600 font-medium text-xs uppercase tracking-wider bg-green-50 px-2 py-1 rounded">Безплатна</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end border-t border-stone-100 pt-6 mb-8">
+                            <span class="text-lg font-serif font-bold text-brand-dark">Общо</span>
+                            <div class="text-right">
+                                <span class="block text-3xl font-bold text-brand-teal" th:text="${#numbers.formatDecimal(totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
+                                <span class="text-xs text-stone-400">с включено ДДС</span>
+                            </div>
+                        </div>
+
+                        <a th:href="@{/checkout}" class="block w-full bg-brand-dark text-white text-center font-bold py-4 rounded-xl hover:bg-brand-teal transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            Към Плащане <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                        </a>
+
+                        <div class="mt-6 text-center">
+                            <p class="text-xs text-stone-400 leading-relaxed">
+                                <i class="fas fa-shield-alt mr-1"></i> Сигурно плащане и защита на данните.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
 </body>
 </html>
