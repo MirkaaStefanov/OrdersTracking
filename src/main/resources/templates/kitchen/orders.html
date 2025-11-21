@@ -44,7 +44,7 @@
             flashGreen: {
               '0%': { borderColor: '#67b0b6', boxShadow: '0 0 0 4px rgba(103, 176, 182, 0.3)' },
               '20%': { borderColor: '#67b0b6', boxShadow: '0 0 0 8px rgba(103, 176, 182, 0.5)' },
-              '100%': { borderColor: '#292524', boxShadow: 'none' }
+              '100%': { borderColor: '#e7e5e4', boxShadow: 'none' }
             }
           }
         }
@@ -52,23 +52,23 @@
     }
   </script>
   <style>
-    /* Custom Scrollbar for dark theme */
+    /* Custom Scrollbar for Light theme */
     ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #1c1917; }
-    ::-webkit-scrollbar-thumb { background: #44403c; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #57534e; }
+    ::-webkit-scrollbar-track { background: #f5f5f4; }
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
 
     body { font-family: 'Montserrat', sans-serif; }
     h1, h2, h3, .font-serif { font-family: 'Cormorant Garamond', serif; }
   </style>
 </head>
-<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col">
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col">
 
 <!-- Toast Container -->
 <div id="toast-container" class="fixed top-24 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
 <!-- Header -->
-<header class="bg-brand-dark border-b border-white/10 px-6 py-4 shadow-lg sticky top-0 z-50">
+<header class="bg-brand-dark text-white border-b border-white/10 px-6 py-4 shadow-lg sticky top-0 z-50">
   <div class="flex justify-between items-center">
     <div class="flex items-center gap-4">
       <div id="logo-border" class="h-10 w-10 md:h-12 md:w-12 rounded-full border-2 border-white/80 flex items-center justify-center overflow-hidden transition-all duration-300 bg-white">
@@ -87,12 +87,12 @@
     <div class="flex items-center gap-3 md:gap-6">
 
       <!-- Sound Toggle -->
-      <button id="sound-toggle" onclick="toggleSound()" class="flex items-center gap-2 text-xs font-bold bg-stone-800 text-stone-400 border border-stone-700 px-4 py-2 rounded-full hover:bg-stone-700 transition-all cursor-pointer">
+      <button id="sound-toggle" onclick="toggleSound()" class="flex items-center gap-2 text-xs font-bold bg-stone-800 text-stone-400 border border-stone-600 px-4 py-2 rounded-full hover:bg-stone-700 transition-all cursor-pointer shadow-sm">
         <i class="fas fa-volume-mute text-lg"></i> <span class="hidden md:inline">Sound Off</span>
       </button>
 
       <!-- Connection Status -->
-      <div id="connection-status" class="flex items-center gap-2 text-xs uppercase font-bold text-red-500 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/30 transition-all duration-300">
+      <div id="connection-status" class="flex items-center gap-2 text-xs uppercase font-bold text-red-400 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20 transition-all duration-300">
         <span class="w-2 h-2 rounded-full bg-red-500"></span> <span class="hidden md:inline">Connecting...</span>
       </div>
 
@@ -106,7 +106,7 @@
 </header>
 
 <!-- Main Content -->
-<main class="flex-grow p-6 overflow-y-auto">
+<main class="flex-grow p-6 overflow-y-auto bg-stone-50">
 
   <!-- Orders Grid -->
   <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
@@ -116,60 +116,62 @@
     <div th:each="order : ${orders}"
          th:id="'order-' + ${order.id}"
          th:data-timestamp="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}"
-         class="group relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col hover:border-brand-teal/50 transition-all duration-300 animate-fade-in-up">
+         class="group relative bg-white rounded-2xl overflow-hidden border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up flex flex-col">
 
       <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-teal to-brand-dark"></div>
 
-      <div class="p-5 border-b border-stone-800 flex justify-between items-start bg-stone-900/50">
+      <!-- Card Header -->
+      <div class="p-5 border-b border-stone-100 flex justify-between items-start bg-stone-50/80">
         <div>
           <div class="flex items-center gap-2 mb-1">
-            <span class="text-2xl font-serif font-bold text-white">#<span th:text="${order.id}">123</span></span>
+            <span class="text-3xl font-serif font-bold text-brand-dark">#<span th:text="${order.id}">123</span></span>
           </div>
-          <div class="flex items-center gap-2 text-xs text-stone-400 font-medium uppercase tracking-wider">
-            <i class="far fa-clock"></i>
+          <div class="flex items-center gap-2 text-xs text-stone-500 font-medium uppercase tracking-wider">
+            <i class="far fa-clock text-brand-teal"></i>
             <span th:text="${#temporals.format(order.orderDate, 'HH:mm')}">14:30</span>
           </div>
         </div>
         <div class="flex flex-col items-end">
-                         <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal/10 text-brand-teal border border-brand-teal/20 animate-pulse-slow">
+                         <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal text-white shadow-sm animate-pulse-slow">
                             <span th:text="${order.status}">PROCESSING</span>
                          </span>
         </div>
       </div>
 
+      <!-- Card Body -->
       <div class="p-5 flex-grow space-y-4">
-        <div class="flex items-start gap-3 text-sm text-stone-300 bg-stone-800/50 p-3 rounded-lg">
-          <i class="fas fa-map-marker-alt mt-1 text-brand-gold shrink-0"></i>
-          <span class="leading-snug font-medium" th:text="${order.location}">Location</span>
+        <div class="flex items-start gap-3 text-sm text-stone-700 bg-stone-100 p-3 rounded-xl border border-stone-200/50">
+          <i class="fas fa-map-marker-alt mt-1 text-brand-teal shrink-0"></i>
+          <span class="leading-snug font-semibold" th:text="${order.location}">Location</span>
         </div>
 
-        <div class="w-full h-px bg-stone-800"></div>
-
         <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-          <li th:each="item : ${order.items}" class="flex justify-between items-start group/item">
-            <div class="flex items-start gap-3">
-                                <span class="flex items-center justify-center w-6 h-6 rounded-md bg-brand-teal/20 text-brand-teal font-bold text-sm shrink-0 border border-brand-teal/30"
+          <li th:each="item : ${order.items}" class="flex justify-between items-start group/item p-2 rounded-lg hover:bg-stone-50 transition-colors">
+            <div class="flex items-start gap-3 w-full">
+                                <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-brand-dark text-white font-bold text-sm shrink-0 shadow-sm"
                                       th:text="${item.quantity}">1</span>
-              <span class="text-stone-200 font-medium leading-snug group-hover/item:text-white transition-colors" th:text="${item.product.name}">Product</span>
+              <span class="text-stone-800 font-medium leading-snug text-lg" th:text="${item.product.name}">Product</span>
             </div>
           </li>
         </ul>
       </div>
 
-      <div class="p-4 bg-stone-950/30 border-t border-stone-800 flex justify-between items-center">
-        <span class="text-xs text-stone-500 font-mono" th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy')}">Date</span>
-        <span class="text-sm font-serif font-bold text-stone-300" th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
+      <!-- Card Footer -->
+      <div class="p-4 bg-stone-50 border-t border-stone-100 flex justify-between items-center text-sm mt-auto">
+        <span class="text-xs text-stone-400 font-medium" th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy')}">Date</span>
+        <span class="text-lg font-serif font-bold text-brand-dark" th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)} + ' лв.'">0.00 лв.</span>
       </div>
     </div>
 
   </div>
 
-  <div th:if="${orders.isEmpty()}" id="empty-state" class="h-full flex flex-col items-center justify-center text-stone-600 min-h-[60vh]">
-    <div class="w-32 h-32 rounded-full bg-stone-900 flex items-center justify-center mb-6 shadow-inner border border-stone-800">
-      <i class="fas fa-check text-5xl text-stone-700"></i>
+  <!-- Empty State -->
+  <div th:if="${orders.isEmpty()}" id="empty-state" class="h-full flex flex-col items-center justify-center text-stone-600 min-h-[60vh] animate-fade-in-up">
+    <div class="w-32 h-32 rounded-full bg-white flex items-center justify-center mb-6 shadow-xl border border-stone-100">
+      <i class="fas fa-check text-5xl text-brand-teal"></i>
     </div>
-    <h2 class="text-3xl font-serif font-bold text-stone-500 mb-2">Всичко е готово!</h2>
-    <p class="text-stone-600">Няма чакащи поръчки в момента.</p>
+    <h2 class="text-3xl font-serif font-bold text-brand-dark mb-2">Всичко е готово!</h2>
+    <p class="text-stone-500">Няма чакащи поръчки в момента.</p>
   </div>
 
 </main>
@@ -200,7 +202,7 @@
           // Play test sound
           playNotificationSound();
       } else {
-          btn.className = "flex items-center gap-2 text-xs font-bold bg-stone-800 text-stone-400 border border-stone-700 px-4 py-2 rounded-full hover:bg-stone-700 transition-all cursor-pointer";
+          btn.className = "flex items-center gap-2 text-xs font-bold bg-stone-800 text-stone-400 border border-stone-600 px-4 py-2 rounded-full hover:bg-stone-700 transition-all cursor-pointer shadow-sm";
           btn.innerHTML = '<i class="fas fa-volume-mute text-lg"></i> <span class="hidden md:inline">Sound Off</span>';
       }
   }
@@ -251,8 +253,6 @@
       });
 
       // Re-append elements in new order
-      // Note: Using appendChild moves the existing DOM element, it does not recreate it.
-      // This preserves selection but might restart CSS animations if logic isn't careful.
       cards.forEach(card => container.appendChild(card));
   }
 
@@ -269,29 +269,21 @@
 
   let isOptimisticallyLive = false;
 
-  // Optimistic Connection Logic:
-  // If headers are buffered by proxy, readyState might stay 0 (Connecting).
-  // If no error occurs within 2.5 seconds, assume we are essentially live to improve UX.
   setTimeout(() => {
-      if (eventSource.readyState !== 2) { // If not closed/error
+      if (eventSource.readyState !== 2) {
           updateStatus(true);
           isOptimisticallyLive = true;
       }
   }, 2500);
 
-  // Monitor Connection State Periodically
   setInterval(() => {
       if (eventSource.readyState === 1) {
-          // 1 = OPEN
           updateStatus(true);
           isOptimisticallyLive = true;
       } else if (eventSource.readyState === 2) {
-          // 2 = CLOSED
           updateStatus(false);
           isOptimisticallyLive = false;
       } else if (eventSource.readyState === 0) {
-          // 0 = CONNECTING
-          // Only show "Connecting" if we haven't already decided we are optimistically live
           if (!isOptimisticallyLive) {
               updateStatus(false);
           }
@@ -310,12 +302,10 @@
       isOptimisticallyLive = false;
   };
 
-  // Handle Unnamed Events (Default)
   eventSource.onmessage = function(event) {
       handleIncomingOrder(event);
   };
 
-  // Handle Named Events (Common in Spring Boot SSE)
   eventSource.addEventListener("order", function(event) {
       handleIncomingOrder(event);
   });
@@ -330,17 +320,16 @@
 
   function updateStatus(isLive) {
       if (isLive) {
-          statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-green-500 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/30 transition-all duration-300";
+          statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-200 transition-all duration-300 shadow-sm";
           statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> <span class="hidden md:inline">Live</span>';
       } else {
-          statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-red-500 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/30 transition-all duration-300";
+          statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-red-500 bg-red-50 px-4 py-2 rounded-full border border-red-200 transition-all duration-300 shadow-sm";
           statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> <span class="hidden md:inline">Connecting...</span>';
       }
   }
 
   // --- 4. Handle New Orders ---
   function handleIncomingOrder(event) {
-      // Fail-safe: If we get data, we are definitely live
       updateStatus(true);
       isOptimisticallyLive = true;
 
@@ -350,26 +339,23 @@
 
           if (emptyState) emptyState.style.display = 'none';
 
-          // Deduplicate
           if(document.getElementById('order-' + order.id)) return;
 
-          // Render Items
           let itemsHtml = '';
           if (order.items && Array.isArray(order.items)) {
               order.items.forEach(item => {
                   let productName = item.product ? item.product.name : (item.productName || "Unknown");
                   let qty = item.quantity || 1;
                   itemsHtml += `
-                      <li class="flex justify-between items-start group/item">
-                          <div class="flex items-start gap-3">
-                              <span class="flex items-center justify-center w-6 h-6 rounded-md bg-brand-teal/20 text-brand-teal font-bold text-sm shrink-0 border border-brand-teal/30">${qty}</span>
-                              <span class="text-stone-200 font-medium leading-snug group-hover/item:text-white transition-colors">${productName}</span>
+                      <li class="flex justify-between items-start group/item p-2 rounded-lg hover:bg-stone-50 transition-colors">
+                          <div class="flex items-start gap-3 w-full">
+                              <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-brand-dark text-white font-bold text-sm shrink-0 shadow-sm">${qty}</span>
+                              <span class="text-stone-800 font-medium leading-snug text-lg">${productName}</span>
                           </div>
                       </li>`;
               });
           }
 
-          // Format Date
           let dateObj = new Date();
           if (order.orderDate) {
               if (Array.isArray(order.orderDate)) {
@@ -393,62 +379,54 @@
               pad(dateObj.getSeconds());
 
           const card = document.createElement('div');
-          // HIGHLIGHT: 'animate-flash-green' added ONLY to new cards
-          card.className = 'group relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col hover:border-brand-teal/50 transition-all duration-300 animate-fade-in-up animate-flash-green';
+          card.className = 'group relative bg-white rounded-2xl overflow-hidden border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up animate-flash-green flex flex-col';
           card.id = 'order-' + order.id;
           card.setAttribute('data-timestamp', sortableTimestamp);
 
           card.innerHTML = `
               <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-teal to-brand-dark"></div>
 
-              <div class="p-5 border-b border-stone-800 flex justify-between items-start bg-stone-900/50">
+              <div class="p-5 border-b border-stone-100 flex justify-between items-start bg-stone-50/80">
                   <div>
                       <div class="flex items-center gap-2 mb-1">
-                          <span class="text-2xl font-serif font-bold text-white">#${order.id}</span>
+                          <span class="text-3xl font-serif font-bold text-brand-dark">#${order.id}</span>
                       </div>
-                      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium uppercase tracking-wider">
-                          <i class="far fa-clock"></i>
+                      <div class="flex items-center gap-2 text-xs text-stone-500 font-medium uppercase tracking-wider">
+                          <i class="far fa-clock text-brand-teal"></i>
                           <span>${timeStr}</span>
                       </div>
                   </div>
                   <div class="flex flex-col items-end">
-                       <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal/10 text-brand-teal border border-brand-teal/20 animate-pulse-slow">
+                       <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal text-white shadow-sm animate-pulse-slow">
                           ${order.status || 'PROCESSING'}
                        </span>
                   </div>
               </div>
 
               <div class="p-5 flex-grow space-y-4">
-                  <div class="flex items-start gap-3 text-sm text-stone-300 bg-stone-800/50 p-3 rounded-lg">
-                       <i class="fas fa-map-marker-alt mt-1 text-brand-gold shrink-0"></i>
-                       <span class="leading-snug font-medium">${order.location || 'Unknown'}</span>
+                  <div class="flex items-start gap-3 text-sm text-stone-700 bg-stone-100 p-3 rounded-xl border border-stone-200/50">
+                       <i class="fas fa-map-marker-alt mt-1 text-brand-teal shrink-0"></i>
+                       <span class="leading-snug font-semibold">${order.location || 'Unknown'}</span>
                   </div>
-
-                  <div class="w-full h-px bg-stone-800"></div>
 
                   <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                       ${itemsHtml}
                   </ul>
               </div>
 
-              <div class="p-4 bg-stone-950/30 border-t border-stone-800 flex justify-between items-center">
-                   <span class="text-xs text-stone-500 font-mono">${dateStr}</span>
-                   <span class="text-sm font-serif font-bold text-stone-300">${priceStr} лв.</span>
+              <div class="p-4 bg-stone-50 border-t border-stone-100 flex justify-between items-center text-sm mt-auto">
+                   <span class="text-xs text-stone-400 font-medium">${dateStr}</span>
+                   <span class="text-lg font-serif font-bold text-brand-dark">${priceStr} лв.</span>
               </div>
           `;
 
-          // Append to container
           ordersContainer.appendChild(card);
 
-          // Remove the flash class after 5 seconds to ensure only "new" ones look active
           setTimeout(() => {
               card.classList.remove('animate-flash-green');
           }, 5000);
 
-          // PLAY SOUND
           playNotificationSound();
-
-          // Re-sort
           sortOrders();
 
       } catch (e) {
