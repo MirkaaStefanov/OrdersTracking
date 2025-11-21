@@ -8,15 +8,22 @@ import com.example.OrdersTracking.models.Order;
 import com.example.OrdersTracking.models.OrderItem;
 import com.example.OrdersTracking.repositories.OrderItemRepository;
 import com.example.OrdersTracking.repositories.OrderRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,17 +32,17 @@ import java.util.stream.Collectors;
 // Този код е само ПРИМЕРЕН и зависи от вашите Entity-та
 
 @Service
+@Data
+@RequiredArgsConstructor
 public class OrderService {
 
-    // Трябва да създадете OrderRepository и OrderItemRepository
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final SseService sseService;
+    private final EmailService emailService;
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-    @Autowired
-    private SseService sseService;
+    @Value("${app.base.url}")
+    private String baseURL;
 
     // @Autowired private EmailService emailService; // За изпращане на имейли
 
@@ -55,6 +62,7 @@ public class OrderService {
         order.setCustomerEmail(guestDetails.getEmail());
         order.setCustomerPhone(guestDetails.getPhone());
         order.setLocation(guestDetails.getLocation());
+        order.setCash(guestDetails.isCash());
 
         if (guestDetails.isCash()) {
             order.setStatus(OrderStatus.PROCESSING); // Cash payment -> start processing immediately
@@ -92,8 +100,9 @@ public class OrderService {
         savedOrder.setItems(savedItems);
         Order sendOrder = orderRepository.save(savedOrder);
 
-        if(guestDetails.isCash()){
+        if (guestDetails.isCash()) {
             sseService.sendNewOrderEvent(sendOrder);
+            sendEmail(sendOrder);
         }
 
         return savedOrder;
@@ -111,10 +120,47 @@ public class OrderService {
         order.setStatus(OrderStatus.PROCESSING);
         Order savedOrder = orderRepository.save(order);
         sseService.sendNewOrderEvent(savedOrder);
+        sendEmail(savedOrder);
     }
     //TODO send email to track order
 
-    public List<Order> ordersForKitchen(){
+    public void sendEmail(Order order) {
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("customerName", order.getCustomerEmail());
+        properties.put("orderId", order.getId());
+
+
+        BigDecimal bgnPrice = order.getTotalPrice();
+        // Fixed exchange rate: 1.95583
+        BigDecimal eurPrice = bgnPrice.divide(BigDecimal.valueOf(1.95583), 2, RoundingMode.HALF_UP);
+
+        // Format: "25.50 лв. / 13.04 €"
+        String formattedPrice = String.format("%.2f лв. / %.2f €", bgnPrice, eurPrice);
+
+        properties.put("amount", formattedPrice);
+
+        // Create the link using your base URL
+        String trackingLink = baseURL + "/order/track/" + order.getId()+"/"+order.getAccessToken();
+        properties.put("trackingLink", trackingLink);
+
+        // Send the email
+        emailService.sendHtmlEmail(
+                order.getCustomerEmail(),
+                "Order Confirmation #" + order.getId(),
+                "email/order-confirmation", // Path to html file inside templates folder (no .html extension)
+                properties
+        );
+
+    }
+
+    public Order findByIdAndToken(Long id, String token) throws ChangeSetPersister.NotFoundException {
+
+        return orderRepository.findByIdAndAccessToken(id, token).orElseThrow(ChangeSetPersister.NotFoundException::new);
+    }
+
+
+    public List<Order> ordersForKitchen() {
         List<Order> allOrders = orderRepository.findAll();
 
         // 2. Filter by Status and Map to DTO

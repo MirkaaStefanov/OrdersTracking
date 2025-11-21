@@ -50,6 +50,7 @@ public class Order {
     private String customerEmail;
 
     private String customerPhone;
+    private boolean cash;
     private String location; // Местоположение/адрес
 
     // --- ДАННИ ЗА ПОРЪЧКАТА ---
