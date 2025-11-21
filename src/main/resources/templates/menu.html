@@ -61,13 +61,118 @@
             </div>
         </div>
 
-        <div onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' })"
+        <div onclick="document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })"
              class="absolute bottom-10 left-1/2 transform -translate-x-1/2 cursor-pointer animate-bounce hover:text-brand-teal transition-colors z-20">
             <i class="fas fa-chevron-down text-white/70 text-4xl"></i>
         </div>
     </section>
 
-    <!-- 2. ABOUT SECTION -->
+    <!-- 2. MENU SECTION (MOVED UP) -->
+    <section id="menu-section" class="py-24 bg-stone-50 relative overflow-hidden min-h-screen">
+
+        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-teal/5 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-brand-gold/5 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
+
+        <div class="container mx-auto px-4 relative z-10">
+
+            <div class="text-center mb-16">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                    <div class="h-[1px] w-8 bg-brand-gold"></div>
+                    <h3 class="text-brand-teal font-medium tracking-widest uppercase text-sm">Culinary Delights</h3>
+                    <div class="h-[1px] w-8 bg-brand-gold"></div>
+                </div>
+                <h2 class="text-4xl md:text-6xl font-serif font-bold text-brand-dark mb-6">Нашето Ежедневно Меню</h2>
+                <p class="mt-4 text-stone-500 max-w-2xl mx-auto italic font-light text-lg">
+                    "Пресни местни съставки, традиционни рецепти предавани през поколенията и модерен прочит за ценители."
+                </p>
+            </div>
+
+            <!-- Dynamic Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-14" id="category-buttons">
+                <!-- 'All' Button -->
+                <button onclick="filterMenu('all', this)"
+                        class="category-btn active px-8 py-3 rounded-full font-medium transition-all duration-300 relative overflow-hidden bg-brand-dark text-white shadow-lg scale-105 ring-2 ring-brand-teal ring-offset-2">
+                    Всички
+                </button>
+
+                <!-- Category Loop -->
+                <button th:each="cat : ${categories}"
+                        th:data-category="${cat}"
+                        onclick="filterMenu(this.getAttribute('data-category'), this)"
+                        th:text="${cat.displayName}"
+                        class="category-btn px-8 py-3 rounded-full font-medium transition-all duration-300 relative overflow-hidden bg-white text-stone-600 hover:bg-stone-100">
+                    Category Name
+                </button>
+            </div>
+
+            <div th:if="${menu == null or menu.isEmpty()}" class="text-center py-20">
+                <div class="inline-block p-6 rounded-full bg-stone-100 mb-4 text-brand-muted">
+                    <i class="fas fa-utensils text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-serif font-bold text-stone-600 mb-2">В момента няма налични продукти</h2>
+                <p class="text-stone-400">Моля, опитайте отново по-късно.</p>
+            </div>
+
+            <div id="menu-grid" th:unless="${menu == null or menu.isEmpty()}" class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6 max-w-6xl mx-auto items-start">
+
+                <div th:each="product : ${menu}"
+                     class="menu-item group relative bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-100 flex justify-between items-start gap-5"
+                     th:attr="data-category=${product.category}">
+
+                    <div class="absolute top-0 left-0 w-1.5 h-0 bg-brand-teal group-hover:h-full transition-all duration-300 rounded-l-2xl"></div>
+
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-baseline mb-2">
+                            <h3 class="text-xl md:text-2xl font-serif font-bold text-brand-dark group-hover:text-brand-teal transition-colors" th:text="${product.name}">
+                                Име на продукт
+                            </h3>
+                            <div class="flex gap-2 ml-2" th:if="${#strings.containsIgnoreCase(product.description, 'без месо') or #strings.containsIgnoreCase(product.description, 'сирене') or #strings.containsIgnoreCase(product.description, 'спанак')}">
+                                <i class="fas fa-leaf text-green-500 text-sm"></i>
+                            </div>
+                        </div>
+
+                        <div class="w-full border-b border-dotted border-stone-300 mb-3 opacity-30"></div>
+
+                        <p class="text-stone-500 text-sm font-light leading-relaxed mb-3" th:text="${product.description}">
+                            Описание на продукта...
+                        </p>
+
+                        <div class="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                            <!-- Tags based on category or description -->
+                            <span th:if="${product.category != null}"
+                                  th:text="${product.category.displayName}"
+                                  class="text-xs uppercase tracking-wider font-bold text-brand-teal bg-teal-50 px-2 py-0.5 rounded">
+                                   Cat
+                             </span>
+                            <span class="text-xs uppercase tracking-wider font-bold text-brand-gold bg-amber-50 px-2 py-0.5 rounded">Special</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-end shrink-0 min-w-[100px]">
+                        <span class="text-2xl font-serif font-bold text-brand-dark group-hover:scale-105 transition-transform duration-300" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' лв.'">
+                            9.90 лв.
+                        </span>
+                        <span class="text-xs text-stone-400 font-medium mt-1" th:text="${#numbers.formatDecimal(product.euroPrice, 1, 2)} + ' €'">
+                            5.01 €
+                        </span>
+
+                        <!-- Dynamic AJAX Form -->
+                        <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="mt-3 add-to-cart-form" onsubmit="addToCart(event, this)">
+                            <input type="hidden" name="quantity" value="1" />
+                            <button type="submit"
+                                    class="w-10 h-10 rounded-full bg-stone-100 text-brand-dark flex items-center justify-center transition-all hover:bg-brand-teal hover:text-white hover:scale-110 shadow-md"
+                                    title="Добави">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. ABOUT SECTION (MOVED DOWN) -->
     <section id="about" class="py-24 bg-brand-dark text-white relative overflow-hidden">
         <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#67b0b6 1px, transparent 1px); background-size: 30px 30px;"></div>
 
@@ -127,111 +232,6 @@
                     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] border border-white/5 rounded-full -z-0 animate-spin-slow pointer-events-none"></div>
                     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] border border-white/5 rounded-full -z-0 animate-spin-slow pointer-events-none" style="animation-direction: reverse;"></div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. MENU SECTION -->
-    <section id="menu-section" class="py-24 bg-stone-50 relative overflow-hidden min-h-screen">
-
-        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-teal/5 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-brand-gold/5 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
-
-        <div class="container mx-auto px-4 relative z-10">
-
-            <div class="text-center mb-16">
-                <div class="flex items-center justify-center gap-3 mb-4">
-                    <div class="h-[1px] w-8 bg-brand-gold"></div>
-                    <h3 class="text-brand-teal font-medium tracking-widest uppercase text-sm">Culinary Delights</h3>
-                    <div class="h-[1px] w-8 bg-brand-gold"></div>
-                </div>
-                <h2 class="text-4xl md:text-6xl font-serif font-bold text-brand-dark mb-6">Нашето Ежедневно Меню</h2>
-                <p class="mt-4 text-stone-500 max-w-2xl mx-auto italic font-light text-lg">
-                    "Пресни местни съставки, традиционни рецепти предавани през поколенията и модерен прочит за ценители."
-                </p>
-            </div>
-
-            <!-- Dynamic Filter Buttons -->
-            <div class="flex flex-wrap justify-center gap-3 mb-14" id="category-buttons">
-                <!-- 'All' Button -->
-                <button onclick="filterMenu('all', this)"
-                        class="category-btn active px-8 py-3 rounded-full font-medium transition-all duration-300 relative overflow-hidden bg-brand-dark text-white shadow-lg scale-105 ring-2 ring-brand-teal ring-offset-2">
-                    Всички
-                </button>
-
-                <!-- Category Loop -->
-                <button th:each="cat : ${categories}"
-                        th:data-category="${cat}"
-                        onclick="filterMenu(this.getAttribute('data-category'), this)"
-                        th:text="${cat.displayName}"
-                        class="category-btn px-8 py-3 rounded-full font-medium transition-all duration-300 relative overflow-hidden bg-white text-stone-600 hover:bg-stone-100">
-                    Category Name
-                </button>
-            </div>
-
-            <div th:if="${menu == null or menu.isEmpty()}" class="text-center py-20">
-                <div class="inline-block p-6 rounded-full bg-stone-100 mb-4 text-brand-muted">
-                    <i class="fas fa-utensils text-4xl"></i>
-                </div>
-                <h2 class="text-2xl font-serif font-bold text-stone-600 mb-2">В момента няма налични продукти</h2>
-                <p class="text-stone-400">Моля, опитайте отново по-късно.</p>
-            </div>
-
-            <div id="menu-grid" th:unless="${menu == null or menu.isEmpty()}" class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mx-auto items-start">
-
-                <div th:each="product : ${menu}"
-                     class="menu-item group relative bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-stone-100 flex justify-between items-start gap-3"
-                     th:attr="data-category=${product.category}">
-
-                    <div class="absolute top-0 left-0 w-1 h-0 bg-brand-teal group-hover:h-full transition-all duration-300 rounded-l-lg"></div>
-
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-baseline mb-1">
-                            <h3 class="text-base font-serif font-bold text-brand-dark group-hover:text-brand-teal transition-colors" th:text="${product.name}">
-                                Име на продукт
-                            </h3>
-                            <div class="flex gap-2 ml-2" th:if="${#strings.containsIgnoreCase(product.description, 'без месо') or #strings.containsIgnoreCase(product.description, 'сирене') or #strings.containsIgnoreCase(product.description, 'спанак')}">
-                                <i class="fas fa-leaf text-green-500 text-[10px]"></i>
-                            </div>
-                        </div>
-
-                        <div class="w-full border-b border-dotted border-stone-300 mb-1 opacity-30"></div>
-
-                        <p class="text-stone-500 text-xs font-light leading-relaxed mb-1" th:text="${product.description}">
-                            Описание на продукта...
-                        </p>
-
-                        <div class="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-                            <!-- Tags based on category or description -->
-                            <span th:if="${product.category != null}"
-                                  th:text="${product.category.displayName}"
-                                  class="text-[10px] uppercase tracking-wider font-bold text-brand-teal bg-teal-50 px-2 py-0.5 rounded">
-                                   Cat
-                             </span>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-brand-gold bg-amber-50 px-2 py-0.5 rounded">Special</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-end shrink-0 min-w-[80px]">
-                        <span class="text-lg font-serif font-bold text-brand-dark group-hover:scale-105 transition-transform duration-300" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' лв.'">
-                            9.90 лв.
-                        </span>
-                        <span class="text-[10px] text-stone-400 font-medium mt-0.5" th:text="${#numbers.formatDecimal(product.euroPrice, 1, 2)} + ' €'">
-                            5.01 €
-                        </span>
-
-                        <!-- Dynamic AJAX Form -->
-                        <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="mt-2 add-to-cart-form" onsubmit="addToCart(event, this)">
-                            <input type="hidden" name="quantity" value="1" />
-                            <button type="submit"
-                                    class="w-8 h-8 rounded-full bg-stone-100 text-brand-dark flex items-center justify-center transition-all hover:bg-brand-teal hover:text-white hover:scale-110 shadow-sm"
-                                    title="Добави">
-                                <i class="fas fa-plus text-xs"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
             </div>
         </div>
     </section>
