@@ -34,7 +34,7 @@
           animation: {
              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-             'flash-green': 'flashGreen 2s ease-out forwards',
+             'flash-green': 'flashGreen 4s ease-out forwards',
           },
           keyframes: {
             fadeInUp: {
@@ -42,8 +42,8 @@
               '100%': { opacity: '1', transform: 'translateY(0)' },
             },
             flashGreen: {
-              '0%': { borderColor: '#67b0b6', boxShadow: '0 0 20px rgba(103, 176, 182, 0.5)' },
-              '50%': { borderColor: '#67b0b6', boxShadow: '0 0 30px rgba(103, 176, 182, 0.8)' },
+              '0%': { borderColor: '#67b0b6', boxShadow: '0 0 0 4px rgba(103, 176, 182, 0.3)' },
+              '20%': { borderColor: '#67b0b6', boxShadow: '0 0 0 8px rgba(103, 176, 182, 0.5)' },
               '100%': { borderColor: '#292524', boxShadow: 'none' }
             }
           }
@@ -88,8 +88,8 @@
       </button>
 
       <!-- Connection Status -->
-      <div id="connection-status" class="flex items-center gap-2 text-xs uppercase font-bold text-green-500 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/30 transition-all duration-300">
-        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> <span class="hidden md:inline">Live</span>
+      <div id="connection-status" class="flex items-center gap-2 text-xs uppercase font-bold text-red-500 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/30 transition-all duration-300">
+        <span class="w-2 h-2 rounded-full bg-red-500"></span> <span class="hidden md:inline">Connecting...</span>
       </div>
 
       <form th:action="@{/logout}" method="post" class="hidden md:block">
@@ -108,7 +108,10 @@
   <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
 
     <!-- Existing Orders Loop -->
-    <div th:each="order : ${orders}" th:id="'order-' + ${order.id}"
+    <!-- data-timestamp formatted as 'yyyy-MM-dd HH:mm:ss' for reliable alphabetical sorting -->
+    <div th:each="order : ${orders}"
+         th:id="'order-' + ${order.id}"
+         th:data-timestamp="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}"
          class="group relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col hover:border-brand-teal/50 transition-all duration-300 animate-fade-in-up">
 
       <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-teal to-brand-dark"></div>
@@ -173,21 +176,26 @@
   let audioCtx = new AudioContext();
   let isSoundEnabled = false;
 
-  function toggleSound() {
-      const btn = document.getElementById('sound-toggle');
-
+  // Fix for browsers blocking audio: Unlock on first click anywhere
+  document.addEventListener('click', function() {
       if (audioCtx.state === 'suspended') {
           audioCtx.resume();
       }
+  }, { once: true });
 
-      if (!isSoundEnabled) {
-          isSoundEnabled = true;
+  function toggleSound() {
+      const btn = document.getElementById('sound-toggle');
+      isSoundEnabled = !isSoundEnabled;
+
+      if (isSoundEnabled) {
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+
           btn.className = "flex items-center gap-2 text-xs font-bold bg-brand-teal text-white border border-brand-teal px-4 py-2 rounded-full shadow-lg hover:bg-brand-teal/80 transition-all cursor-pointer";
           btn.innerHTML = '<i class="fas fa-volume-up text-lg"></i> <span class="hidden md:inline">Sound On</span>';
+
           // Play test sound
           playNotificationSound();
       } else {
-          isSoundEnabled = false;
           btn.className = "flex items-center gap-2 text-xs font-bold bg-stone-800 text-stone-400 border border-stone-700 px-4 py-2 rounded-full hover:bg-stone-700 transition-all cursor-pointer";
           btn.innerHTML = '<i class="fas fa-volume-mute text-lg"></i> <span class="hidden md:inline">Sound Off</span>';
       }
@@ -206,7 +214,7 @@
       gain1.connect(audioCtx.destination);
       osc1.type = 'sine';
       osc1.frequency.setValueAtTime(880, now); // A5
-      gain1.gain.setValueAtTime(0.1, now);
+      gain1.gain.setValueAtTime(0.5, now);
       gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
       osc1.start(now);
       osc1.stop(now + 0.5);
@@ -218,51 +226,103 @@
       gain2.connect(audioCtx.destination);
       osc2.type = 'sine';
       osc2.frequency.setValueAtTime(698.46, now + 0.4); // F5
-      gain2.gain.setValueAtTime(0.1, now + 0.4);
+      gain2.gain.setValueAtTime(0.5, now + 0.4);
       gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
       osc2.start(now + 0.4);
       osc2.stop(now + 1.5);
   }
 
-  // --- 2. Sorting Logic ---
+  // --- 2. Sorting Logic (OLDEST FIRST / Ascending Date) ---
   function sortOrders() {
       const container = document.getElementById('orders-container');
-      // Get all direct children divs that have an ID starting with 'order-'
       const cards = Array.from(container.querySelectorAll('div[id^="order-"]'));
 
       if (cards.length < 2) return;
 
       cards.sort((a, b) => {
-          // Extract ID numbers: "order-123" -> 123
-          const idA = parseInt(a.id.split('-')[1] || 0);
-          const idB = parseInt(b.id.split('-')[1] || 0);
-          // Sort Descending (Newest ID first)
-          return idB - idA;
+          const timeA = a.getAttribute('data-timestamp') || '';
+          const timeB = b.getAttribute('data-timestamp') || '';
+          // Ascending order: Oldest at top
+          return timeA.localeCompare(timeB);
       });
 
       // Re-append elements in new order
+      // Note: Using appendChild moves the existing DOM element, it does not recreate it.
+      // This preserves selection but might restart CSS animations if logic isn't careful.
       cards.forEach(card => container.appendChild(card));
   }
 
-  // Run sorting immediately on load
   document.addEventListener('DOMContentLoaded', sortOrders);
 
 
   // --- 3. SSE Connection ---
-  const eventSource = new EventSource('/kitchen/stream');
+  const sseUrl = [[@{/kitchen/stream}]];
+  const eventSource = new EventSource(sseUrl);
+
   const ordersContainer = document.getElementById('orders-container');
   const emptyState = document.getElementById('empty-state');
   const statusIndicator = document.getElementById('connection-status');
 
+  let isOptimisticallyLive = false;
+
+  // Optimistic Connection Logic:
+  // If headers are buffered by proxy, readyState might stay 0 (Connecting).
+  // If no error occurs within 2.5 seconds, assume we are essentially live to improve UX.
+  setTimeout(() => {
+      if (eventSource.readyState !== 2) { // If not closed/error
+          updateStatus(true);
+          isOptimisticallyLive = true;
+      }
+  }, 2500);
+
+  // Monitor Connection State Periodically
+  setInterval(() => {
+      if (eventSource.readyState === 1) {
+          // 1 = OPEN
+          updateStatus(true);
+          isOptimisticallyLive = true;
+      } else if (eventSource.readyState === 2) {
+          // 2 = CLOSED
+          updateStatus(false);
+          isOptimisticallyLive = false;
+      } else if (eventSource.readyState === 0) {
+          // 0 = CONNECTING
+          // Only show "Connecting" if we haven't already decided we are optimistically live
+          if (!isOptimisticallyLive) {
+              updateStatus(false);
+          }
+      }
+  }, 2000);
+
   eventSource.onopen = function() {
       console.log("SSE Connected");
       updateStatus(true);
+      isOptimisticallyLive = true;
   };
 
   eventSource.onerror = function(event) {
       console.error("SSE Error", event);
       updateStatus(false);
+      isOptimisticallyLive = false;
   };
+
+  // Handle Unnamed Events (Default)
+  eventSource.onmessage = function(event) {
+      handleIncomingOrder(event);
+  };
+
+  // Handle Named Events (Common in Spring Boot SSE)
+  eventSource.addEventListener("order", function(event) {
+      handleIncomingOrder(event);
+  });
+
+  eventSource.addEventListener("new-order", function(event) {
+       handleIncomingOrder(event);
+  });
+
+  eventSource.addEventListener("create", function(event) {
+       handleIncomingOrder(event);
+  });
 
   function updateStatus(isLive) {
       if (isLive) {
@@ -270,12 +330,16 @@
           statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> <span class="hidden md:inline">Live</span>';
       } else {
           statusIndicator.className = "flex items-center gap-2 text-xs uppercase font-bold text-red-500 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/30 transition-all duration-300";
-          statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> <span class="hidden md:inline">Offline</span>';
+          statusIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> <span class="hidden md:inline">Connecting...</span>';
       }
   }
 
   // --- 4. Handle New Orders ---
   function handleIncomingOrder(event) {
+      // Fail-safe: If we get data, we are definitely live
+      updateStatus(true);
+      isOptimisticallyLive = true;
+
       try {
           const order = JSON.parse(event.data);
           if (!order || !order.id) return;
@@ -301,18 +365,38 @@
               });
           }
 
-          // Format Data
-          const dateObj = order.orderDate ? (Array.isArray(order.orderDate) ? new Date(order.orderDate[0], order.orderDate[1]-1, order.orderDate[2], order.orderDate[3], order.orderDate[4]) : new Date(order.orderDate)) : new Date();
-          const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          // Format Date
+          let dateObj = new Date();
+          if (order.orderDate) {
+              if (Array.isArray(order.orderDate)) {
+                   dateObj = new Date(order.orderDate[0], order.orderDate[1]-1, order.orderDate[2], order.orderDate[3], order.orderDate[4], order.orderDate[5] || 0);
+              } else {
+                   dateObj = new Date(order.orderDate);
+              }
+          }
+
+          const timeStr = dateObj.toLocaleTimeString('bg-BG', {hour: '2-digit', minute:'2-digit'});
           const dateStr = dateObj.toLocaleDateString('bg-BG');
           const priceStr = order.totalPrice ? Number(order.totalPrice).toFixed(2) : "0.00";
 
+          const pad = (n) => n < 10 ? '0' + n : n;
+          const sortableTimestamp =
+              dateObj.getFullYear() + '-' +
+              pad(dateObj.getMonth() + 1) + '-' +
+              pad(dateObj.getDate()) + ' ' +
+              pad(dateObj.getHours()) + ':' +
+              pad(dateObj.getMinutes()) + ':' +
+              pad(dateObj.getSeconds());
+
           const card = document.createElement('div');
+          // HIGHLIGHT: 'animate-flash-green' added ONLY to new cards
           card.className = 'group relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col hover:border-brand-teal/50 transition-all duration-300 animate-fade-in-up animate-flash-green';
           card.id = 'order-' + order.id;
+          card.setAttribute('data-timestamp', sortableTimestamp);
 
           card.innerHTML = `
               <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-teal to-brand-dark"></div>
+
               <div class="p-5 border-b border-stone-800 flex justify-between items-start bg-stone-900/50">
                   <div>
                       <div class="flex items-center gap-2 mb-1">
@@ -325,61 +409,47 @@
                   </div>
                   <div class="flex flex-col items-end">
                        <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-brand-teal/10 text-brand-teal border border-brand-teal/20 animate-pulse-slow">
-                          ${order.status || 'NEW'}
+                          ${order.status || 'PROCESSING'}
                        </span>
                   </div>
               </div>
+
               <div class="p-5 flex-grow space-y-4">
                   <div class="flex items-start gap-3 text-sm text-stone-300 bg-stone-800/50 p-3 rounded-lg">
                        <i class="fas fa-map-marker-alt mt-1 text-brand-gold shrink-0"></i>
-                       <span class="leading-snug font-medium">${order.location || 'No Location'}</span>
+                       <span class="leading-snug font-medium">${order.location || 'Unknown'}</span>
                   </div>
+
                   <div class="w-full h-px bg-stone-800"></div>
+
                   <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                       ${itemsHtml}
                   </ul>
               </div>
+
               <div class="p-4 bg-stone-950/30 border-t border-stone-800 flex justify-between items-center">
                    <span class="text-xs text-stone-500 font-mono">${dateStr}</span>
                    <span class="text-sm font-serif font-bold text-stone-300">${priceStr} лв.</span>
               </div>
           `;
 
-          // PREPEND adds to the start (Top Left)
-          ordersContainer.prepend(card);
+          // Append to container
+          ordersContainer.appendChild(card);
 
+          // Remove the flash class after 5 seconds to ensure only "new" ones look active
+          setTimeout(() => {
+              card.classList.remove('animate-flash-green');
+          }, 5000);
+
+          // PLAY SOUND
           playNotificationSound();
-          showToast(`Нова поръчка #${order.id}`);
+
+          // Re-sort
+          sortOrders();
 
       } catch (e) {
-          console.error("Parsing error", e);
+          console.error("Error parsing SSE data", e);
       }
-  }
-
-  eventSource.addEventListener('order', handleIncomingOrder);
-  eventSource.addEventListener('new-order', handleIncomingOrder);
-  eventSource.addEventListener('create', handleIncomingOrder);
-  eventSource.onmessage = handleIncomingOrder;
-
-  function showToast(message) {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'pointer-events-auto flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl bg-brand-teal text-white transform transition-all duration-500 translate-x-full opacity-0 border border-white/10';
-      toast.innerHTML = `
-          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center animate-bounce">
-              <i class="fas fa-bell"></i>
-          </div>
-          <div>
-              <span class="block font-bold text-sm uppercase tracking-wider">Внимание</span>
-              <span class="text-sm font-medium opacity-90">${message}</span>
-          </div>
-      `;
-      container.appendChild(toast);
-      requestAnimationFrame(() => toast.classList.remove('translate-x-full', 'opacity-0'));
-      setTimeout(() => {
-          toast.classList.add('translate-x-full', 'opacity-0');
-          setTimeout(() => toast.remove(), 500);
-      }, 5000);
   }
 </script>
 </body>
