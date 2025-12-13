@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -79,7 +80,7 @@
                                     <!-- Right: Controls -->
                                     <div class="flex flex-col items-end justify-between gap-4">
                                         <!-- Delete Button -->
-                                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post">
+                                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post" class="cart-action-form">
                                             <button type="submit" class="text-stone-300 hover:text-red-500 p-1 -mr-1">
                                                 <i class="fas fa-trash-alt text-xs"></i>
                                             </button>
@@ -87,7 +88,7 @@
 
                                         <!-- Quantity Controls -->
                                         <div class="flex items-center border border-stone-200 rounded-full h-7 bg-white shadow-sm">
-                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full cart-action-form">
                                                 <input type="hidden" name="quantity" th:value="${item.quantity - 1}" />
                                                 <button type="submit" class="w-7 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal"
                                                         th:disabled="${item.quantity <= 1}"
@@ -96,7 +97,7 @@
                                                 </button>
                                             </form>
                                             <span class="w-6 text-center font-bold text-brand-dark text-xs" th:text="${item.quantity}">2</span>
-                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full cart-action-form">
                                                 <input type="hidden" name="quantity" th:value="${item.quantity + 1}" />
                                                 <button type="submit" class="w-7 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal">
                                                     <i class="fas fa-plus text-[9px]"></i>
@@ -121,7 +122,7 @@
                                     <!-- 2. Quantity -->
                                     <div class="col-span-3 flex justify-center">
                                         <div class="flex items-center border border-stone-200 rounded-full h-10 bg-white shadow-sm">
-                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full cart-action-form">
                                                 <input type="hidden" name="quantity" th:value="${item.quantity - 1}" />
                                                 <button type="submit" class="w-10 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal transition-colors"
                                                         th:disabled="${item.quantity <= 1}"
@@ -132,7 +133,7 @@
 
                                             <span class="w-8 text-center font-bold text-brand-dark text-sm" th:text="${item.quantity}">2</span>
 
-                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full">
+                                            <form th:action="@{/cart/update/{productId}(productId=${item.product.id})}" method="post" class="h-full cart-action-form">
                                                 <input type="hidden" name="quantity" th:value="${item.quantity + 1}" />
                                                 <button type="submit" class="w-10 h-full flex items-center justify-center text-stone-400 hover:text-brand-teal transition-colors">
                                                     <i class="fas fa-plus text-xs"></i>
@@ -152,7 +153,7 @@
 
                                     <!-- 4. Remove -->
                                     <div class="col-span-1 flex justify-end">
-                                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post">
+                                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post" class="cart-action-form">
                                             <button type="submit" class="w-8 h-8 rounded-full hover:bg-red-50 text-stone-300 hover:text-red-500 transition-all flex items-center justify-center" title="Премахни">
                                                 <i class="fas fa-trash-alt text-sm"></i>
                                             </button>
@@ -214,6 +215,44 @@
             </div>
         </div>
     </section>
+
+    <!-- Script to handle cart updates without causing Server Error on redirects -->
+    <script>
+        document.querySelectorAll('.cart-action-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Visual Feedback
+                const btn = form.querySelector('button');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i>';
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        redirect: 'manual' // Prevent browser from following redirect
+                    });
+
+                    // On success (status 200 or 302/opaque redirect), reload the page to show updated cart
+                    if (response.ok || response.type === 'opaqueredirect' || response.status === 302) {
+                        window.location.reload();
+                    } else {
+                        console.error("Cart update failed", response);
+                        alert('Възникна грешка при обновяване на количката.');
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }
+                } catch(err) {
+                    console.error("Cart update connection error", err);
+                    alert('Грешка при връзката със сървъра.');
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }
+            });
+        });
+    </script>
 </div>
 
 </body>

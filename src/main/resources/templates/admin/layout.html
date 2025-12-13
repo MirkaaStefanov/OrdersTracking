@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -8,6 +9,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title layout:title-pattern="$CONTENT_TITLE - Админ Панел">Борово Око - Админ</title>
+
+  <!-- PWA Configuration (Admin Only) -->
+  <link rel="manifest" th:href="@{/manifest.json}">
+  <meta name="theme-color" content="#1c2e30">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -59,6 +64,19 @@
     ::-webkit-scrollbar-thumb:hover { background: #4a8e94; }
     html { scroll-behavior: smooth; }
   </style>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                console.log('ServiceWorker registration successful');
+            }, function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+  </script>
 </head>
 <body class="bg-stone-50 text-stone-800 antialiased font-sans min-h-screen flex flex-col pt-24">
 
@@ -67,7 +85,7 @@
         id="navbar-container">
   <div class="container mx-auto px-6 flex items-center justify-between">
 
-    <!-- Logo Section (Matched to Public Header Design) -->
+    <!-- Logo Section -->
     <a th:href="@{/admin/products}" class="flex items-center gap-3 cursor-pointer group z-50 relative">
       <div class="h-10 w-10 md:h-12 md:w-12 rounded-full border-2 border-brand-teal flex items-center justify-center overflow-hidden transition-all duration-300 bg-white">
         <img src="https://placehold.co/100x100/67b0b6/ffffff?text=B"
@@ -89,6 +107,14 @@
 
     <!-- Desktop Menu -->
     <div class="hidden md:flex items-center gap-8">
+
+      <!-- Install Button (Modified to support Safari via instructions) -->
+      <button id="pwa-install-btn" class="hidden bg-brand-teal text-white px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-brand-light hover:text-brand-dark transition-all shadow-lg animate-pulse">
+        <i class="fas fa-download mr-2"></i> Install App
+      </button>
+
+      <div class="h-6 w-[1px] bg-white/10"></div>
+
       <a th:href="@{/}" class="nav-link-text text-sm font-medium uppercase tracking-widest text-stone-400 hover:text-white transition-colors relative group">
         <i class="fas fa-globe mr-1"></i> Публичен Сайт
       </a>
@@ -199,6 +225,48 @@
   </div>
 </footer>
 
+<!-- Installation Modal (Updated for better Chrome/Safari support) -->
+<div id="install-modal" class="fixed inset-0 z-[100] bg-black/90 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl relative animate-fade-in-up">
+    <button onclick="document.getElementById('install-modal').classList.add('hidden');" class="absolute top-4 right-4 text-stone-400 hover:text-stone-800">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+    <div class="w-16 h-16 rounded-full bg-brand-dark flex items-center justify-center mx-auto mb-4 text-brand-teal ring-4 ring-brand-teal/20">
+      <i class="fas fa-mobile-alt text-2xl"></i>
+    </div>
+    <h3 class="text-xl font-bold text-brand-dark mb-4">Инсталиране на приложението</h3>
+
+    <div class="space-y-4 text-left bg-stone-50 p-4 rounded-xl border border-stone-100">
+      <!-- Chrome/Desktop -->
+      <div>
+        <p class="font-bold text-stone-700 text-sm mb-1 flex items-center gap-2">
+          <i class="fab fa-chrome text-brand-teal"></i> Google Chrome / Desktop
+        </p>
+        <p class="text-xs text-stone-500 leading-relaxed">
+          Ако не виждате автоматичен прозорец, натиснете иконата за инсталиране <i class="fas fa-download mx-1 text-stone-800"></i> или <i class="fas fa-desktop mx-1 text-stone-800"></i> разположена в дясно на адресната лента (URL bar).
+        </p>
+      </div>
+
+      <div class="h-px bg-stone-200"></div>
+
+      <!-- Safari/Mobile -->
+      <div>
+        <p class="font-bold text-stone-700 text-sm mb-1 flex items-center gap-2">
+          <i class="fab fa-apple text-stone-800"></i> iOS / Safari
+        </p>
+        <ol class="text-xs text-stone-500 space-y-1 ml-4 list-decimal">
+          <li>Натиснете бутона <strong>Сподели</strong> <i class="fas fa-share-square mx-1"></i>.</li>
+          <li>Изберете опцията <strong>"Add to Home Screen"</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <button onclick="document.getElementById('install-modal').classList.add('hidden');" class="w-full bg-brand-teal text-white py-3 rounded-lg font-bold hover:bg-brand-dark transition-colors mt-6 shadow-lg">
+      Разбрах
+    </button>
+  </div>
+</div>
+
 <script>
   const btn = document.getElementById('mobile-menu-btn');
   const closeBtn = document.getElementById('close-mobile-menu');
@@ -226,6 +294,43 @@
               if(span) span.classList.add('w-full');
           }
       });
+
+      // PWA Install Logic
+      const pwaBtn = document.getElementById('pwa-install-btn');
+      const installModal = document.getElementById('install-modal');
+      let deferredPrompt;
+
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+      if (!isStandalone) {
+          if(pwaBtn) pwaBtn.classList.remove('hidden');
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          console.log("Install prompt captured");
+      });
+
+      if(pwaBtn) {
+          pwaBtn.addEventListener('click', (e) => {
+              if(deferredPrompt) {
+                  deferredPrompt.prompt();
+                  deferredPrompt.userChoice.then((choiceResult) => {
+                      deferredPrompt = null;
+                      if(choiceResult.outcome === 'accepted') {
+                          pwaBtn.classList.add('hidden');
+                      }
+                  });
+              } else {
+                  // If no prompt event (already installed or blocked by browser heuristics), show manual instructions
+                  if(installModal) {
+                      installModal.classList.remove('hidden');
+                      installModal.classList.add('flex');
+                  }
+              }
+          });
+      }
   });
 </script>
 </body>
