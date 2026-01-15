@@ -1,9 +1,19 @@
+
+
 <!DOCTYPE html>
 <html lang="bg" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход - Борово Око</title>
+
+    <!-- PWA Configuration -->
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <meta name="theme-color" content="#1c2e30">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Borovo Oko">
+    <link rel="apple-touch-icon" th:href="@{/images/logo.png}">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -45,12 +55,8 @@
 
     <div class="text-center mb-8">
         <a href="/" class="inline-block mb-4">
-            <div id="logo-border" class="h-10 w-10 md:h-12 md:w-12 rounded-full border-2 border-white/80 flex items-center justify-center overflow-hidden transition-all duration-300 bg-white">
-                <img src="https://placehold.co/100x100/67b0b6/ffffff?text=B"
-                     th:src="@{/images/logo.png}"
-                     onerror="this.src='https://placehold.co/100x100/67b0b6/ffffff?text=B'"
-                     alt="Logo"
-                     class="w-full h-full object-cover"/>
+            <div class="h-16 w-16 rounded-full border-2 border-brand-teal flex items-center justify-center mx-auto bg-stone-800/50 backdrop-blur-sm">
+                <span class="text-white font-serif font-bold text-2xl">B</span>
             </div>
         </a>
         <h2 class="text-4xl font-serif font-bold text-white">Добре дошли</h2>

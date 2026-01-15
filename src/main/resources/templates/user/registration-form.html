@@ -1,8 +1,18 @@
+
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Registration Form</title>
+
+  <!-- PWA Configuration -->
+  <link rel="manifest" th:href="@{/manifest.json}">
+  <meta name="theme-color" content="#1c2e30">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Borovo Oko">
+  <link rel="apple-touch-icon" th:href="@{/images/logo.png}">
 
   <script src="https://cdn.tailwindcss.com"></script>
 

@@ -1,10 +1,21 @@
 
+
+
 <!DOCTYPE html>
 <html lang="bg" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Кухня - Поръчки</title>
+
+  <!-- PWA Configuration -->
+  <link rel="manifest" th:href="@{/manifest.json}">
+  <meta name="theme-color" content="#1c2e30">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Borovo Oko">
+  <link rel="apple-touch-icon" th:href="@{/images/logo.png}">
+
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Fonts -->
@@ -67,16 +78,12 @@
 <!-- Toast Container -->
 <div id="toast-container" class="fixed top-24 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
-<!-- Header -->
-<header class="bg-brand-dark text-white border-b border-white/10 px-6 py-4 shadow-lg sticky top-0 z-50">
-  <div class="flex justify-between items-center">
+<!-- Header (Updated to match Admin Layout Design) -->
+<header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3 shadow-xl border-b border-white/10 bg-brand-dark/95 backdrop-blur-md">
+  <div class="px-6 flex justify-between items-center">
     <div class="flex items-center gap-4">
-      <div id="logo-border" class="h-10 w-10 md:h-12 md:w-12 rounded-full border-2 border-white/80 flex items-center justify-center overflow-hidden transition-all duration-300 bg-white">
-        <img src="https://placehold.co/100x100/67b0b6/ffffff?text=B"
-             th:src="@{/images/logo.png}"
-             onerror="this.src='https://placehold.co/100x100/67b0b6/ffffff?text=B'"
-             alt="Logo"
-             class="w-full h-full object-cover"/>
+      <div class="h-12 w-12 rounded-full border-2 border-brand-teal flex items-center justify-center bg-white overflow-hidden shadow-md">
+        <span class="text-brand-dark font-serif font-bold text-xl">B</span>
       </div>
       <div>
         <h1 class="text-2xl md:text-3xl font-bold text-white leading-none tracking-wide">КУХНЯ</h1>
@@ -105,8 +112,8 @@
   </div>
 </header>
 
-<!-- Main Content -->
-<main class="flex-grow p-6 overflow-y-auto bg-stone-50">
+<!-- Main Content (Added pt-24 for fixed header) -->
+<main class="flex-grow p-6 pt-24 overflow-y-auto bg-stone-50">
 
   <!-- Orders Grid -->
   <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
